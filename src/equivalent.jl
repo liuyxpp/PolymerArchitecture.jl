@@ -113,6 +113,8 @@ end
     count_isomorphic_subtree(BlockCopolymerGraph, subtree)
 
 Return the number of subtrees which are isomorphic to the input `subtree`.
+
+Note for a same set of vertices, there may be multiple isomorphic trees, thus the number will always be larger or equal to `length(all_isomorphic_subtree(bcg, subtree))`.
 """
 function count_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree::Subtree)
     vmap1 = collect(1:nv(bcg.graph))
@@ -126,16 +128,23 @@ end
     all_isomorphic_subtree(BlockCopolymerGraph, subtree)
 
 Find all subtrees which are isomorphic to the input `subtree` in `bcg.graph`.
+
+Note that we keep one subtree for the same set of vertices.
 """
 function all_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree::Subtree)
     T = eltype(bcg.graph)
-    S = typeof(subtree)
     vmap1 = collect(1:nv(bcg.graph))
     vmap2 = subtree.vmap
+    # ilist is a Channel. After collect, it is a list of list of 2-element tuples.
+    # [[(3, 1),(8, 2),(5, 3)], [(6, 1),(4, 2),(9, 3)]
+    # In each tuple, the first one corresponds to the vertex indexed in the first argument of `all_induced_subgraphisomorph`, the second one to the second argument.
+    # Here, [3,8,5] is isomorphic to [6,4,9] in the first argument graph. And a mapping relation exists, such as 3 <=> 6, 8 <=> 4, and 5 <=> 9.
     ilist = all_induced_subgraphisomorph(bcg.graph, subtree.graph;
         vertex_relation=(v1,v2)->equivalent_blockend(bcg,v1,v2,vmap1,vmap2),
         edge_relation=(e1,e2)->equivalent_block(bcg,e1,e2,vmap1,vmap2))
 
+    # We collect all vertices in the first argument, i.e. bcg.graph.
+    # The front vertex is the one mapping to `subtree.v`.
     vertices_list = []
     front_vertex_list = T[]
     for tree in collect(ilist)
@@ -147,6 +156,7 @@ function all_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree::Subtree)
         push!(vertices_list, vs)
     end
 
+    # Construct `Subtree` objects. Only one subtree is constructed for a same set of vertices.
     subtrees = [subtree]
     for i in 1:length(vertices_list)
         newtree = true
