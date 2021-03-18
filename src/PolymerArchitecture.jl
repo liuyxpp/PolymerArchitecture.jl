@@ -25,4 +25,8 @@ export
     count_isomorphic_subtree,
     all_isomorphic_subtree
 
+include("process.jl")
+export
+    group_isomorphic_subtrees
+
 end # module
