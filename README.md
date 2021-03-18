@@ -16,8 +16,8 @@ Documentation is not available yet. However, one can consult the test codes resi
 
 ## Contribute
 
-* Star the package on [github.com](https://github.com/liuyxpp/Polymer.jl).
-* File an issue or make a pull request on [github.com](https://github.com/liuyxpp/Polymer.jl).
+* Star the package on [github.com](https://github.com/liuyxpp/PolymerArchitecture.jl).
+* File an issue or make a pull request on [github.com](https://github.com/liuyxpp/PolymerArchitecture.jl).
 * Contact the author via email <lyx@fudan.edu.cn>.
 
 ## Links

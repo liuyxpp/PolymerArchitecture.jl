@@ -1,0 +1,4 @@
+[deps]
+LightGraphs = "093fc24a-ae57-5d10-9952-331d41423f4d"
+Polymer = "3c6f16a5-7773-4db2-b4fd-b1ef4c83c671"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
