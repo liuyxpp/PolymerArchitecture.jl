@@ -13,7 +13,8 @@ export
     find_leaf_neighbor,
     find_neighbors!,
     find_neighbors,
-    induced_subtree
+    induced_subtree,
+    merge_subtrees
 
 include("equivalent.jl")
 export

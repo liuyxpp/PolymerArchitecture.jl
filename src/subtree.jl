@@ -197,3 +197,12 @@ function induced_subtree(graph::AbstractGraph, subtree1::Subtree, subtree2::Subt
 end
 
 induced_subtree(bcg::BlockCopolymerGraph, subtree1::Subtree, subtree2::Subtree) = induced_subtree(bcg.graph, subtree1, subtree2)
+
+function merge_subtrees(bcg::BlockCopolymerGraph, subtrees::AbstractVector{T}) where T<:AbstractSubtree
+    first_tree = first(subtrees)
+    vs = typeof(first_tree.v)[]
+    for tree in subtrees
+        append!(vs, tree.vmap)
+    end
+    return Subtree(bcg, unique(vs), first_tree.v)
+end

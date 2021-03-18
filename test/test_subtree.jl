@@ -59,3 +59,9 @@ end
     subtree = induced_subtree(branchg, subtree1, subtree2)
     @test Set(subtree.vmap) == Set([7, 8, 2, 4])
 end
+
+@testset "subtree.jl: merge_subtrees" begin
+    subtree1, subtree2 = induced_subtree(branchg, Edge(2,7))
+    subtree = merge_subtrees(branchg, [subtree1, subtree2])
+    @test Set(subtree.vmap) == Set(1:nv(branchg.graph))
+end
