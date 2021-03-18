@@ -115,11 +115,10 @@ function process_isolated_isomorphic_subtrees(bcg::BlockCopolymerGraph, subtrees
         end
         for i in 1:m
             if !processed[i]
-                push!(semiequiv_subtrees_subset, subtrees[i])
+                push!(semi_equivalent_subtrees, subtrees[i])
                 processed[i] = true
             end
         end
-        push!(semi_equivalent_subtrees, semiequiv_subtrees_subset)
     end
 
     return equivalent_subtrees, semi_equivalent_subtrees

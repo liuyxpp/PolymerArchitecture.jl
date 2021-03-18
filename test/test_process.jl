@@ -49,3 +49,14 @@ end
     @test Set(itree1.vmap) == Set([1, 9, 10, 2])
     @test Set(itree2.vmap) == Set([6, 13, 14, 4])
 end
+
+@testset "equivalent.jl: process_leaf" begin
+    es, ss = process_leaf(branchg, 13)
+    @test length(es) == 1
+    @test length(ss) == 0
+    etree1, etree2 = first(es)
+    @test Set(etree1.vmap) == Set([4, 5, 12, 6, 13, 14, 8, 7])
+    @test etree1.v == 7
+    @test Set(etree2.vmap) == Set([2, 1, 9, 10, 3, 11, 7, 8])
+    @test etree2.v == 8
+end
