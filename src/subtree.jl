@@ -41,6 +41,13 @@ Return the front vertex of a Subtree object. Note that the vertex is indexed in 
 front_vertex(subtree::Subtree) = subtree.v
 
 """
+    front_vertices(subtrees)
+
+Return a list of front vertices corresponding to the list of subtrees.
+"""
+front_vertices(subtrees) = [subtree.v for subtree in subtrees]
+
+"""
     front_edge(subtree)
 
 Return front edges of a Subtree object. A front edge is an edge in the subtree that contains the front vertex. Note that all edges are indexed in the original graph (the graph that the subtree is induced).
@@ -198,7 +205,7 @@ end
 
 induced_subtree(bcg::BlockCopolymerGraph, subtree1::Subtree, subtree2::Subtree) = induced_subtree(bcg.graph, subtree1, subtree2)
 
-function merge_subtrees(bcg::BlockCopolymerGraph, subtrees::AbstractVector{T}) where T<:AbstractSubtree
+function merge_subtrees(bcg::BlockCopolymerGraph, subtrees)
     first_tree = first(subtrees)
     vs = typeof(first_tree.v)[]
     for tree in subtrees

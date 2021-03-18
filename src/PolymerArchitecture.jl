@@ -9,6 +9,7 @@ include("subtree.jl")
 export
     Subtree,
     front_vertex,
+    front_vertices,
     front_edges,
     find_leaf_neighbor,
     find_neighbors!,
@@ -31,6 +32,7 @@ export
     group_isomorphic_subtrees,
     process_isomorphic_subtree_groups,
     process_isolated_isomorphic_subtrees,
-    process_equivalent_subtrees
+    process_equivalent_subtrees,
+    process_leaf
 
 end # module

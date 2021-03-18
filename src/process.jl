@@ -3,7 +3,8 @@
 
 Group isomorphic subtrees according to the front vertex. Those subtrees share same front vertex are grouped into one group.
 """
-function group_isomorphic_subtrees(subtrees::AbstractVector{T}) where T<:AbstractSubtree
+function group_isomorphic_subtrees(subtrees)
+    T = typeof(first(subtrees))
     unique_vertices = [subtree.v for subtree in subtrees] |> unique
     subtree_groups = []
     for v in unique_vertices
@@ -163,22 +164,78 @@ function process_equivalent_subtrees(bcg::BlockCopolymerGraph, subtrees)
     for i in 1:m
         subtree = subtrees[i]
         v = subtree.v
-        isomorphic_vertices = copy(subtree.vmap)
-        new_front_vertex = nothing
-        for vx in neighbors(bcg.graph, v)
-            (vx ∈ subtree.vmap) && continue
-            subtreex, _ = induced_subtree(bcg, Edge(vx, v))
-            tomerge = true
-            for vi in front_vertices
-                # we are in the branch containing all other equivalent subtrees
-                (vi ∈ subtreex.vmap) && (tomerge = false; break)
+        # induced all branches including subtree itself from front vertex v
+        branches = induced_subtree(bcg, v)
+        to_merge_branches = []  # store all branches to be merged
+        exbranch = nothing  # the branch contains all other front vertices excpet v. This branch should not be merged.
+        for branch in branches
+            # a branch is not a exbranch by default
+            exclude = false
+            for vf in front_vertices
+                # the front vertex v is in all branches, should be skipped.
+                (vf == v) && continue
+                # If any front vertex other than v is in the branch, we are in the exbran. Set the flag to be true and break this loop.
+                (vf ∈ branch.vmap) && (exclude = true; break)
             end
-            tomerge ? append!(isomorphic_vertices, subtree.vmap) : new_front_vertex = vx
+            exclude ? (exbranch=branch) : push!(to_merge_branches, branch)
         end
-        push!(isomorphic_vertices, new_front_vertex)
-        new_subtree = Subtree(bcg, isomorphic_vertices, new_front_vertex)
+        # Find the new front vertex in the exbranch which forms an edge with v.
+        # Note that the internal front vertex (exbranch.vi) is used. And we have to convert the internal index to the original BlockCopolymerGraph.
+        vnext = exbranch.vmap[first(neighbors(exbranch.graph, exbranch.vi))]
+        # Merge all branches excluding the exbranch.
+        merged_subtree = merge_subtrees(bcg, to_merge_branches)
+        # Add the new front vertex into the merged subtree.
+        new_vertices = copy(merged_subtree.vmap)
+        push!(new_vertices, vnext)
+        # Generate the new subtree and add it to the list.
+        new_subtree = Subtree(bcg, new_vertices, vnext)
         push!(isomorphic_subtrees, new_subtree)
     end
 
     return equivalent_subtrees, isomorphic_subtrees
+end
+
+"""
+    process_leaf(BlockCopolymerGraph, leaf_vertex)
+
+Process the whole BlockCopolymerGraph to identify equivalent and semi-equivalent subtrees starting from a leaf vertex.
+"""
+function process_leaf(bcg::BlockCopolymerGraph, v)
+    equivalent_subtrees = []
+    semi_equivalent_subtrees = []
+
+    vnext = find_leaf_neighbor(bcg, v)
+    subtree = Subtree(bcg.graph, [v, vnext], vnext)
+
+    n = count_isomorphic_subtree(bcg, subtree)
+    (n == 1) && return [], [], [], []
+
+    subtrees = all_isomorphic_subtree(bcg, subtree)
+    isomorphic_subtrees_list = [subtrees]
+
+    while length(isomorphic_subtrees_list) > 0
+        equiv_subtrees_list = []
+        equiv_vertices_list = []
+        for isomorphic_subtrees in isomorphic_subtrees_list
+            sg = group_isomorphic_subtrees(isomorphic_subtrees)
+            es, ss, is = process_isomorphic_subtree_groups(bcg, sg)
+            append!(equivalent_subtrees, es)
+            append!(semi_equivalent_subtrees, ss)
+            for isolated_subtrees in is
+                es, ss = process_isolated_isomorphic_subtrees(bcg,
+                                                isolated_subtrees)
+                append!(semi_equivalent_subtrees, ss)
+                append!(equiv_subtrees_list, es)
+            end
+        end
+
+        isomorphic_subtrees_list = []
+        for equiv_subtrees in equiv_subtrees_list
+            es, is = process_equivalent_subtrees(bcg, equiv_subtrees)
+            (length(es) > 0) && push!(equivalent_subtrees, es)
+            (length(is) > 0) && push!(isomorphic_subtrees_list, is)
+        end
+    end
+
+    return equivalent_subtrees, semi_equivalent_subtrees
 end
