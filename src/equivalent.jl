@@ -58,7 +58,7 @@ We say a tree is symmetric about two vertices v1 and v2, if its depth first tras
 * `subtree`: an induced subtree of the `bcg.graph`.
 * `v1`, `v2`: are two vertices in the `subtree` which are indexed in the orginal `bcg.graph`.
 """
-function is_symmetric_tree(bcg::BlockCopolymerGraph, subtree::Subtree, v1, v2)
+function is_symmetric_subtree(bcg::BlockCopolymerGraph, subtree::Subtree, v1, v2)
     # If tree only has two vertices (one common edge), then it is symmetric.
     (nv(subtree.graph) == 2) && return true
 
@@ -71,4 +71,40 @@ function is_symmetric_tree(bcg::BlockCopolymerGraph, subtree::Subtree, v1, v2)
     return has_isomorph(dfs1, dfs2;
             vertex_relation=(v1,v2)->equivalent_blockend(bcg,v1,v2,vmap,vmap),
             edge_relation=(e1,e2)->equivalent_block(bcg,e1,e2,vmap,vmap))
+end
+
+"""
+    is_isomorphic_tree(BlockCopolymerGraph, subtree1, subtree2)
+
+Return whether a pair of subtrees, `subtree1` and `subtree2`, are isomorphic.
+
+We say a pair of subtrees are isomorphic, named isomorphic subtrees, if their depth-first trasversal paths (directed graphs) starting from their front vertices are isomorphic, in the sense that all blocks are equivalent and all blockends are equivalent.
+"""
+function is_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree1::Subtree, subtree2::Subtree)
+    dfs1 = dfs_tree(subtree1.graph, subtree1.vi)
+    dfs2 = dfs_tree(subtree2.graph, subtree2.vi)
+    vmap1, vmap2 = subtree1.vmap, subtree2.vmap
+    return has_isomorph(dfs1, dfs2;
+            vertex_relation=(v1,v2)->equivalent_blockend(bcg,v1,v2,vmap1,vmap2),
+            edge_relation=(e1,e2)->equivalent_block(bcg,e1,e2,vmap1,vmap2))
+end
+
+"""
+    is_equivalent_subtree(BlockCopolymerGraph, subtree1, subtree2; check=false)
+
+Return whether `subtree1` and `subtree2` are equivalent.
+
+We say two subtrees are equivalent, named as equivalent subtrees, if they are isomorphic AND the vertices not in these two subtrees forms an induced subtree that is symmetric about the two front vertices of `subtree1` and `subtree2`.
+
+Note that in this function, subtree1 and subtree2 are implicitly assumed to be isomorphic. Because the only way to obtain subtree1 and subtree2 is by connecting one or more equivalent subtrees in our applications.
+
+In other applications, one may have to check whether `subtree1` and `subtree2` are isomorphic.
+"""
+function is_equivalent_subtree(bcg::BlockCopolymerGraph, subtree1::Subtree, subtree2::Subtree; check=false)
+    if check
+        is_isomorphic_subtree(bcg, subtree1, subtree2) || return false
+    end
+
+    subtree = induced_subtree(bcg, subtree1, subtree2)
+    return is_symmetric_subtree(bcg, subtree, subtree1.v, subtree2.v)
 end
