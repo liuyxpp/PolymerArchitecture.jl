@@ -48,3 +48,22 @@ end
     subtree2 = Subtree(semibranchg, [4,6,13,14], 4)
     @test !is_equivalent_subtree(semibranchg, subtree1, subtree2)
 end
+
+@testset "equivalent.jl: count_isomorphic_subtree" begin
+    subtree = Subtree(branchg, [3,11], 3)
+    @test count_isomorphic_subtree(branchg, subtree) == 2
+    subtree = Subtree(branchg, [1,10], 1)
+    @test count_isomorphic_subtree(branchg, subtree) == 4
+end
+
+@testset "equivalent.jl: all_isomorphic_subtree" begin
+    subtree = Subtree(branchg, [7,2,1,10,9,3,11], 7)
+    isotrees = all_isomorphic_subtree(branchg, subtree)
+    @test length(isotrees) == 2
+    @test isotrees[1].vmap == [7, 2, 1, 10, 9, 3, 11]
+    @test isotrees[2].vmap == [8, 4, 6, 13, 14, 5, 12]
+
+    subtree = Subtree(semibranchg, [7,2,1,10,9,3,11], 7)
+    isotrees = all_isomorphic_subtree(semibranchg, subtree)
+    @test length(isotrees) == 1
+end

@@ -54,6 +54,13 @@ function front_edges(subtree::Subtree)
 end
 
 """
+    find_leaf_neighbor(BlockCopolymerGraph, v)
+
+Return the vertex which forms an edge with the leaf vertex. Note that there should be only one neighbor of the leaf vertex.
+"""
+find_leaf_neighbor(bcg::BlockCopolymerGraph, v) = first(neighbors(bcg.graph, v))
+
+"""
     find_neighbors(vertices, graph, v, vfrom)
 
 Find those neighbors and all their neighborhood that are connected to vertex v, excluding the one vfrom and its all neighborhood.

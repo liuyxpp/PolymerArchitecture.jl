@@ -108,3 +108,55 @@ function is_equivalent_subtree(bcg::BlockCopolymerGraph, subtree1::Subtree, subt
     subtree = induced_subtree(bcg, subtree1, subtree2)
     return is_symmetric_subtree(bcg, subtree, subtree1.v, subtree2.v)
 end
+
+"""
+    count_isomorphic_subtree(BlockCopolymerGraph, subtree)
+
+Return the number of subtrees which are isomorphic to the input `subtree`.
+"""
+function count_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree::Subtree)
+    vmap1 = collect(1:nv(bcg.graph))
+    vmap2 = subtree.vmap
+    return count_induced_subgraphisomorph(bcg.graph, subtree.graph;
+            vertex_relation=(v1,v2)->equivalent_blockend(bcg,v1,v2,vmap1,vmap2),
+            edge_relation=(e1,e2)->equivalent_block(bcg,e1,e2,vmap1,vmap2))
+end
+
+"""
+    all_isomorphic_subtree(BlockCopolymerGraph, subtree)
+
+Find all subtrees which are isomorphic to the input `subtree` in `bcg.graph`.
+"""
+function all_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree::Subtree)
+    T = eltype(bcg.graph)
+    S = typeof(subtree)
+    vmap1 = collect(1:nv(bcg.graph))
+    vmap2 = subtree.vmap
+    ilist = all_induced_subgraphisomorph(bcg.graph, subtree.graph;
+        vertex_relation=(v1,v2)->equivalent_blockend(bcg,v1,v2,vmap1,vmap2),
+        edge_relation=(e1,e2)->equivalent_block(bcg,e1,e2,vmap1,vmap2))
+
+    vertices_list = []
+    front_vertex_list = T[]
+    for tree in collect(ilist)
+        vs = T[]
+        for (v1, v2) in tree
+            push!(vs, v1)
+            (vmap2[v2] == subtree.v) && push!(front_vertex_list, v1)
+        end
+        push!(vertices_list, vs)
+    end
+
+    subtrees = [subtree]
+    for i in 1:length(vertices_list)
+        newtree = true
+        vs = vertices_list[i]
+        fv = front_vertex_list[i]
+        for tree in subtrees
+            (Set(vs) == Set(tree.vmap)) && (newtree=false; break)
+        end
+        newtree && push!(subtrees, Subtree(bcg, vs, fv))
+    end
+
+    return subtrees
+end

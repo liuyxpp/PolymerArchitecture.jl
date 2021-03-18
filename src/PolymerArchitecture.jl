@@ -10,6 +10,7 @@ export
     Subtree,
     front_vertex,
     front_edges,
+    find_leaf_neighbor,
     find_neighbors!,
     find_neighbors,
     induced_subtree
@@ -20,6 +21,8 @@ export
     equivalent_block,
     is_symmetric_subtree,
     is_isomorphic_subtree,
-    is_equivalent_subtree
+    is_equivalent_subtree,
+    count_isomorphic_subtree,
+    all_isomorphic_subtree
 
 end # module
