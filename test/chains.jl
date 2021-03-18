@@ -19,7 +19,7 @@ function chainAB3A3()
     return BlockCopolymer(:AB3A3, [A, B1, B2, B3, A1, A2, A3])
 end
 
-function branchAB()
+function branchAB(fB7=0.1, fB8=0.1)
 	sA = KuhnSegment(:A)
 	sB = KuhnSegment(:B)
 	eb = branchpoints(8)
@@ -35,8 +35,8 @@ function branchAB()
 	B4 = PolymerBlock(:B4, sB, 0.02, eb[8], fe[4])
 	B5 = PolymerBlock(:B5, sB, 0.02, eb[7], fe[5])
 	B6 = PolymerBlock(:B6, sB, 0.02, eb[7], fe[6])
-	B7 = PolymerBlock(:B7, sB, 0.08, eb[3], eb[4])
-	B8 = PolymerBlock(:B8, sB, 0.12, eb[5], eb[6])
+	B7 = PolymerBlock(:B7, sB, fB7, eb[3], eb[4])
+	B8 = PolymerBlock(:B8, sB, fB8, eb[5], eb[6])
 	return BlockCopolymer(:AB3A3, [A1, A2, A3, A4, A5, B1, B2, B3, B4, B5, B6, B7, B8])
 end
 
@@ -45,3 +45,5 @@ abg = diblock_chain() |> BlockCopolymerGraph
 starAB3A3g = chainAB3A3() |> BlockCopolymerGraph
 
 branchg = branchAB() |> BlockCopolymerGraph
+
+semibranchg = branchAB(0.08, 0.12) |> BlockCopolymerGraph

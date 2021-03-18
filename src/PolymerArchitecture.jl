@@ -16,6 +16,7 @@ export
 
 include("equivalent.jl")
 export
-    equivalent_blockend
+    equivalent_blockend,
+    equivalent_block
 
 end # module
