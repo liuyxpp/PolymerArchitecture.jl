@@ -17,6 +17,7 @@ export
 include("equivalent.jl")
 export
     equivalent_blockend,
-    equivalent_block
+    equivalent_block,
+    is_symmetric_tree
 
 end # module
