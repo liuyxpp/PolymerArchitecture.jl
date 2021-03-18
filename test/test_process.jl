@@ -22,3 +22,30 @@ end
     @test new_isotrees[1].vmap == [1, 9, 10]
     @test new_isotrees[2].vmap == [6, 13, 14]
 end
+
+@testset "equivalent.jl: process_isolated_isomorphic_subtrees" begin
+    subtree = Subtree(branchg, [1,9], 1)
+    isotrees = all_isomorphic_subtree(branchg, subtree)
+    groups = group_isomorphic_subtrees(isotrees)
+    es, ss, is = process_isomorphic_subtree_groups(branchg, groups)
+    es, ss = process_isolated_isomorphic_subtrees(branchg, first(is))
+    @test length(es) == 1
+    @test length(ss) == 0
+    etree1, etree2 = first(es)
+    @test Set(etree1.vmap) == Set([1, 9, 10])
+    @test Set(etree2.vmap) == Set([6, 13, 14])
+end
+
+@testset "equivalent.jl: process_equivalent_subtrees" begin
+    subtree = Subtree(branchg, [1,9], 1)
+    isotrees = all_isomorphic_subtree(branchg, subtree)
+    groups = group_isomorphic_subtrees(isotrees)
+    es, ss, is = process_isomorphic_subtree_groups(branchg, groups)
+    es, ss = process_isolated_isomorphic_subtrees(branchg, first(is))
+    es, is = process_equivalent_subtrees(branchg, first(es))
+    @test length(es) == 0
+    @test length(is) == 2
+    itree1, itree2 = is
+    @test Set(itree1.vmap) == Set([1, 9, 10, 2])
+    @test Set(itree2.vmap) == Set([6, 13, 14, 4])
+end

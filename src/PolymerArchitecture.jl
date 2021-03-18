@@ -29,6 +29,8 @@ export
 include("process.jl")
 export
     group_isomorphic_subtrees,
-    process_isomorphic_subtree_groups
+    process_isomorphic_subtree_groups,
+    process_isolated_isomorphic_subtrees,
+    process_equivalent_subtrees
 
 end # module
