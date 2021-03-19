@@ -35,4 +35,9 @@ export
     process_equivalent_subtrees,
     process_leaf
 
+include("semi_equivalent.jl")
+export
+    group_isomorphic_branches,
+    group_semi_equivalent_subtrees
+
 end # module

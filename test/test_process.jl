@@ -1,4 +1,4 @@
-@testset "equivalent.jl: group_isomorphic_subtrees" begin
+@testset "process.jl: group_isomorphic_subtrees" begin
     subtree = Subtree(branchg, [1,9], 1)
     isotrees = all_isomorphic_subtree(branchg, subtree)
     groups = group_isomorphic_subtrees(isotrees)
@@ -10,7 +10,7 @@
     @test group2[2].vmap == [6, 14]
 end
 
-@testset "equivalent.jl: process_isomorphic_subtree_groups" begin
+@testset "process.jl: process_isomorphic_subtree_groups" begin
     subtree = Subtree(branchg, [1,9], 1)
     isotrees = all_isomorphic_subtree(branchg, subtree)
     groups = group_isomorphic_subtrees(isotrees)
@@ -23,7 +23,7 @@ end
     @test new_isotrees[2].vmap == [6, 13, 14]
 end
 
-@testset "equivalent.jl: process_isolated_isomorphic_subtrees" begin
+@testset "process.jl: process_isolated_isomorphic_subtrees" begin
     subtree = Subtree(branchg, [1,9], 1)
     isotrees = all_isomorphic_subtree(branchg, subtree)
     groups = group_isomorphic_subtrees(isotrees)
@@ -36,7 +36,7 @@ end
     @test Set(etree2.vmap) == Set([6, 13, 14])
 end
 
-@testset "equivalent.jl: process_equivalent_subtrees" begin
+@testset "process.jl: process_equivalent_subtrees" begin
     subtree = Subtree(branchg, [1,9], 1)
     isotrees = all_isomorphic_subtree(branchg, subtree)
     groups = group_isomorphic_subtrees(isotrees)
@@ -50,7 +50,7 @@ end
     @test Set(itree2.vmap) == Set([6, 13, 14, 4])
 end
 
-@testset "equivalent.jl: process_leaf" begin
+@testset "process.jl: process_leaf" begin
     es, ss = process_leaf(branchg, 13)
     @test length(es) == 1
     @test length(ss) == 0

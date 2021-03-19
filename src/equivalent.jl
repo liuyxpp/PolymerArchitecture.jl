@@ -80,7 +80,7 @@ Return whether a pair of subtrees, `subtree1` and `subtree2`, are isomorphic.
 
 We say a pair of subtrees are isomorphic, named isomorphic subtrees, if their depth-first trasversal paths (directed graphs) starting from their front vertices are isomorphic, in the sense that all blocks are equivalent and all blockends are equivalent.
 """
-function is_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree1::Subtree, subtree2::Subtree)
+function is_isomorphic_subtree(bcg::BlockCopolymerGraph, subtree1::T, subtree2::T) where T<:AbstractSubtree
     dfs1 = dfs_tree(subtree1.graph, subtree1.vi)
     dfs2 = dfs_tree(subtree2.graph, subtree2.vi)
     vmap1, vmap2 = subtree1.vmap, subtree2.vmap
