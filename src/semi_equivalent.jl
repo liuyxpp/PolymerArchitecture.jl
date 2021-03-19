@@ -37,7 +37,7 @@ Group semi-equivalent subtrees according to the number of branches emanating fro
 function group_semi_equivalent_subtrees(bcg::BlockCopolymerGraph, subtrees)
     tree_groups = []
 
-    nbranch = [degree(bcg.graph, i) for i in front_vertices(subtrees)]
+    nbranch = [degree(bcg.graph, v) for v in front_vertices(subtrees)]
     nbranch_unique = nbranch |> unique |> sort
 
     for n in nbranch_unique
@@ -93,7 +93,7 @@ process_semi_equivalent_subtree_group
 When there is only one subtree in the group, no process is needed and simply return it as a final semi-equivalent subtree. Note that, to make this subtree useful, we should combine it with other equivalent or semi-equivalent subtrees in the same leaf process.
 """
 function process_semi_equivalent_subtree_group(::Val{1}, bcg::BlockCopolymerGraph, subtrees)
-    return [subtrees], [front_vertices], [], []
+    return [subtrees], []
 end
 
 """
@@ -123,8 +123,8 @@ function process_semi_equivalent_subtree_group(::Val{2}, bcg::BlockCopolymerGrap
         if equivalent_block(bcg, e1, e2)
             vertices1 = [src(e1)]
             vertices2 = [src(e2)]
-            push!(vertices1, subtree1.vmap)
-            push!(vertices2, subtree2.vmap)
+            append!(vertices1, subtree1.vmap)
+            append!(vertices2, subtree2.vmap)
             new_subtree1 = Subtree(bcg, vertices1, src(e1))
             new_subtree2 = Subtree(bcg, vertices2, src(e2))
             push!(isomorphic_subtrees, [new_subtree1, new_subtree2])
@@ -147,7 +147,7 @@ function process_semi_equivalent_subtree_group(::Val{2}, bcg::BlockCopolymerGrap
         bgroup1 = bgroups1[i]
         for j in 1:length(bgroups2)
             bgroup2 = bgroups2[j]
-            if is_isomorphic_tree(first(bgroup1), v1, first(bgroup2), v2, bcg)
+            if is_isomorphic_subtree(bcg, first(bgroup1), first(bgroup2))
                 # Only including minimum number of isomorphic branches
                 p = min(length(bgroup1), length(bgroup2))
                 append!(isomorphic_branches1, bgroup1[1:p])
