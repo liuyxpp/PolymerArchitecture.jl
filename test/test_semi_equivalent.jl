@@ -19,3 +19,18 @@ end
     @test Set(group[2].vmap) == Set([16, 6, 17])
     @test Set(group[3].vmap) == Set([19, 11, 20])
 end
+
+@testset "semi_equivalent.jl: process_semi_equivalent_subtree_group" begin
+    es, ss = process_leaf(branch2g, 13)
+    groups = group_semi_equivalent_subtrees(branch2g, ss)
+    ss, is = process_semi_equivalent_subtree_group(branch2g, first(groups))
+    @test length(ss) == 0
+    @test length(is) == 3
+    is1, is2, is3 = is
+    @test Set(is1[1].vmap) == Set([13, 1, 12, 2])
+    @test Set(is1[2].vmap) == Set([16, 6, 17, 4])
+    @test Set(is2[1].vmap) == Set([13, 1, 12, 2])
+    @test Set(is2[2].vmap) == Set([19, 11, 20, 9])
+    @test Set(is3[1].vmap) == Set([16, 6, 17, 4])
+    @test Set(is3[2].vmap) == Set([19, 11, 20, 9])
+end

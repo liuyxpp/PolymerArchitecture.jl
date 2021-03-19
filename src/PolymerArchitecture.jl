@@ -39,6 +39,8 @@ export
 include("semi_equivalent.jl")
 export
     group_isomorphic_branches,
-    group_semi_equivalent_subtrees
+    group_semi_equivalent_subtrees,
+    process_semi_equivalent_subtree_group,
+    process_semi_equivalent_subtrees
 
 end # module
