@@ -10,6 +10,7 @@ export
     Subtree,
     front_vertex,
     front_vertices,
+    pre_front_vertices,
     front_edges,
     find_leaf_neighbor,
     find_neighbors!,

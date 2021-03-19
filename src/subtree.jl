@@ -38,7 +38,7 @@ Subtree(bcg::BlockCopolymerGraph, vertices, v=0) = Subtree(bcg.graph, vertices, 
 
 Return the front vertex of a Subtree object. Note that the vertex is indexed in the orginal graph (the graph that the subtree is induced).
 """
-front_vertex(subtree::Subtree) = subtree.v
+front_vertex(subtree::AbstractSubtree) = subtree.v
 
 """
     front_vertices(subtrees)
@@ -48,17 +48,18 @@ Return a list of front vertices corresponding to the list of subtrees.
 front_vertices(subtrees) = [subtree.v for subtree in subtrees]
 
 """
-    front_edge(subtree)
+    pre_front_vertices(subtree)
+
+Return a list of vertices which are neighbors of the front vertex.
+"""
+pre_front_vertices(subtree::AbstractSubtree) = [subtree.vmap[vx] for vx in neighbors(subtree.graph, subtree.vi)]
+
+"""
+    front_edges(subtree)
 
 Return front edges of a Subtree object. A front edge is an edge in the subtree that contains the front vertex. Note that all edges are indexed in the original graph (the graph that the subtree is induced).
 """
-function front_edges(subtree::Subtree)
-    edges = Edge{typeof(subtree.v)}[]
-    for vx in neighbors(subtree.graph, subtree.vi)
-        push!(edges, Edge(subtree.v, subtree.vmap[vx]))
-    end
-    return edges
-end
+front_edges(subtree::AbstractSubtree) = [Edge(subtree.v, subtree.vmap[vx]) for vx in neighbors(subtree.graph, subtree.vi)]
 
 """
     find_leaf_neighbor(BlockCopolymerGraph, v)

@@ -10,6 +10,17 @@
     @test subtree.v == 3
 end
 
+@testset "subtree.jl: front_vertices" begin
+    subtrees = induced_subtree(branchg, Edge(2,7))
+    @test front_vertices(subtrees) == [2, 7]
+end
+
+@testset "subtree.jl: pre_front_vertices" begin
+    subtree1, subtree2 = induced_subtree(branchg, Edge(2,7))
+    @test Set(pre_front_vertices(subtree1)) == Set([1, 3])
+    @test pre_front_vertices(subtree2) == [8]
+end
+
 @testset "subtree.jl: front_edges" begin
     subtree1, subtree2 = induced_subtree(branchg, Edge(2,7))
     @test front_vertex(subtree1) == 2
