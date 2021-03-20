@@ -142,6 +142,40 @@ function starABCDO()
     return BlockCopolymer(:ABCDO, [O1, O2, O3, O4, A2, A3, A4, B2, B3, C1, C2, C4, D3, D4, X12, X13, X14])
 end
 
+function starABCDO4()
+    sA = KuhnSegment(:A)
+    sB = KuhnSegment(:B)
+    sC = KuhnSegment(:C)
+    sD = KuhnSegment(:D)
+    sO = KuhnSegment(:O)
+    eb = branchpoints(4)
+
+    O1 = PolymerBlock(:O1, sO, 0.05, eb[1], FreeEnd(:O1))
+    O2 = PolymerBlock(:O2, sO, 0.05, eb[2], FreeEnd(:O2))
+    O3 = PolymerBlock(:O3, sO, 0.05, eb[3], FreeEnd(:O3))
+    O4 = PolymerBlock(:O4, sO, 0.05, eb[4], FreeEnd(:O4))
+
+    A2 = PolymerBlock(:A2, sA, 0.04, eb[2], FreeEnd(:A2))
+    A3 = PolymerBlock(:A3, sA, 0.04, eb[3], FreeEnd(:A3))
+    A4 = PolymerBlock(:A4, sA, 0.04, eb[4], FreeEnd(:A4))
+
+    B2 = PolymerBlock(:B2, sB, 0.03, eb[2], FreeEnd(:B2))
+    B3 = PolymerBlock(:B3, sB, 0.03, eb[3], FreeEnd(:B3))
+
+    C1 = PolymerBlock(:C1, sC, 0.06, eb[1], FreeEnd(:C1))
+    C2 = PolymerBlock(:C2, sC, 0.06, eb[2], FreeEnd(:C2))
+    C4 = PolymerBlock(:C4, sC, 0.06, eb[4], FreeEnd(:C4))
+
+    D3 = PolymerBlock(:D3, sD, 0.1, eb[3], FreeEnd(:D3))
+    D4 = PolymerBlock(:D4, sD, 0.1, eb[4], FreeEnd(:D4))
+
+    X12 = PolymerBlock(:X12, sA, 0.08, eb[1], eb[2])
+    X13 = PolymerBlock(:X13, sB, 0.08, eb[1], eb[3])
+    X14 = PolymerBlock(:X14, sA, 0.08, eb[1], eb[4])
+
+    return BlockCopolymer(:ABCDO, [O1, O2, O3, O4, A2, A3, A4, B2, B3, C1, C2, C4, D3, D4, X12, X13, X14])
+end
+
 abg = diblock_chain() |> BlockCopolymerGraph
 
 branchg = branchAB() |> BlockCopolymerGraph
@@ -157,3 +191,5 @@ starAB3A6g = starAB3A6() |> BlockCopolymerGraph
 starAB4A8g = starAB4A8() |> BlockCopolymerGraph
 
 starABCDOg = starABCDO() |> BlockCopolymerGraph
+
+starABCDO4g = starABCDO4() |> BlockCopolymerGraph
