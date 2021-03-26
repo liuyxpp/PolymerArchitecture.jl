@@ -1,6 +1,19 @@
+using Polymer
+
 branchpoints(n, prefix="EB") = [BranchPoint(Symbol(prefix*string(i))) for i in 1:n]
 
 freeends(n, prefix="A") = [FreeEnd(Symbol(prefix*string(i))) for i in 1:n]
+
+function linearABA(fA1=0.3, fA2=0.3, fB=0.4)
+    sA = KuhnSegment(:A)
+    sB = KuhnSegment(:B)
+    eb = branchpoints(2)
+    fe = freeends(2)
+    A1 = PolymerBlock(:A1, sA, fA1, eb[1], fe[1])
+    A2 = PolymerBlock(:A2, sA, fA2, eb[2], fe[2])
+    B = PolymerBlock(:B, sB, fB, eb[1], eb[2])
+    return BlockCopolymer(:ABA, [A1, A2, B])
+end
 
 function branchAB(fB7=0.1, fB8=0.1)
     sA = KuhnSegment(:A)
@@ -9,9 +22,9 @@ function branchAB(fB7=0.1, fB8=0.1)
     fe = freeends(6, "B")
     A1 = PolymerBlock(:A1, sA, 0.12, eb[1], eb[3])
     A2 = PolymerBlock(:A2, sA, 0.12, eb[2], eb[3])
-    A3 = PolymerBlock(:A1, sA, 0.12, eb[6], eb[8])
-    A4 = PolymerBlock(:A1, sA, 0.12, eb[6], eb[7])
-    A5 = PolymerBlock(:A1, sA, 0.2, eb[4], eb[5])
+    A3 = PolymerBlock(:A3, sA, 0.12, eb[6], eb[8])
+    A4 = PolymerBlock(:A4, sA, 0.12, eb[6], eb[7])
+    A5 = PolymerBlock(:A5, sA, 0.2, eb[4], eb[5])
     B1 = PolymerBlock(:B1, sB, 0.02, eb[1], fe[1])
     B2 = PolymerBlock(:B2, sB, 0.02, eb[1], fe[2])
     B3 = PolymerBlock(:B3, sB, 0.02, eb[2], fe[3])
@@ -51,6 +64,104 @@ function branchAB2()
     B11 = PolymerBlock(:B11, sB, 0.02, eb[11], fe11)
     B12 = PolymerBlock(:B12, sB, 0.02, eb[11], fe12)
     return BlockCopolymer(:AB3A3, [A1, A2, A3, A4, A5, A6, A7, B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12])
+end
+
+"""
+A - B - A - C1
+    |   |
+    C2  D
+"""
+function chainABCACD()
+    sA = KuhnSegment(:A)
+    sB = KuhnSegment(:B)
+    sC = KuhnSegment(:C)
+    sD = KuhnSegment(:D)
+    eb1 = BranchPoint(:EB1)
+    eb2 = BranchPoint(:EB2)
+    eb3 = BranchPoint(:EB3)
+    A1 = PolymerBlock(:A1, sA, 0.2, FreeEnd(:A1), eb1)
+    B = PolymerBlock(:B, sB, 0.3, eb1, eb2)
+    A2 = PolymerBlock(:A2, sA, 0.3, eb2, eb3)
+    C1 = PolymerBlock(:C1, sC, 0.1, eb3, FreeEnd(:C1))
+    C2 = PolymerBlock(:C2, sC, 0.05, eb2, FreeEnd(:C2))
+    D = PolymerBlock(:D, sD, 0.05, eb3, FreeEnd(:D))
+    return BlockCopolymer(:ABCACD, [A1, B, A2, C1, C2, D])
+end
+
+function chainA6B6()
+    sA = KuhnSegment(:A)
+    sB = KuhnSegment(:B)
+    eb0 = BranchPoint(:EB0)
+    eb1 = BranchPoint(:EB1)
+    eb2 = BranchPoint(:EB2)
+    eb3 = BranchPoint(:EB3)
+    eb4 = BranchPoint(:EB4)
+    A1 = PolymerBlock(:A1, sA, 0.1, eb0, FreeEnd(:A1))
+    A2 = PolymerBlock(:A2, sA, 0.1, eb0, FreeEnd(:A2))
+    A3 = PolymerBlock(:A3, sA, 0.05, eb1, FreeEnd(:A3))
+    A4 = PolymerBlock(:A4, sA, 0.1, eb1, eb2)
+    A5 = PolymerBlock(:A5, sA, 0.05, eb3, FreeEnd(:A5))
+    A6 = PolymerBlock(:A6, sA, 0.1, eb3, eb4)
+    B1 = PolymerBlock(:B1, sB, 0.1, eb0, eb1)
+    B2 = PolymerBlock(:B2, sB, 0.05, eb1, FreeEnd(:B2))
+    B3 = PolymerBlock(:B3, sB, 0.1, eb2, FreeEnd(:B3))
+    B4 = PolymerBlock(:B4, sB, 0.1, eb2, eb3)
+    B5 = PolymerBlock(:B5, sB, 0.05, eb2, FreeEnd(:B5))
+    B6 = PolymerBlock(:B6, sB, 0.1, eb4, FreeEnd(:B6))
+    return BlockCopolymer(:A6B6, [A1, A2, A3, A4, A5, A6, B1, B2, B3, B4, B5, B6])
+end
+
+function starA2B2()
+    sA = KuhnSegment(:A)
+    sB = KuhnSegment(:B)
+    eb0 = BranchPoint(:EB0)
+    A1 = PolymerBlock(:A1, sA, 0.25, eb0, FreeEnd(:A1))
+    A2 = PolymerBlock(:A2, sA, 0.25, eb0, FreeEnd(:A2))
+    B1 = PolymerBlock(:B1, sB, 0.25, eb0, FreeEnd(:B1))
+    B2 = PolymerBlock(:B2, sB, 0.25, eb0, FreeEnd(:B2))
+    return BlockCopolymer(:A2B2, [A1, A2, B1, B2])
+end
+
+function starA3()
+    sA = KuhnSegment(:A)
+    eb0 = BranchPoint(:EB0)
+    A1 = PolymerBlock(:A1, sA, 1/3, eb0, FreeEnd(:A1))
+    A2 = PolymerBlock(:A2, sA, 1/3, eb0, FreeEnd(:A2))
+    A3 = PolymerBlock(:A3, sA, 1/3, eb0, FreeEnd(:A3))
+    return BlockCopolymer(:A3, [A1, A2, A3])
+end
+
+function starA4()
+    sA = KuhnSegment(:A)
+    eb0 = BranchPoint(:EB0)
+    A1 = PolymerBlock(:A1, sA, 1/4, eb0, FreeEnd(:A1))
+    A2 = PolymerBlock(:A2, sA, 1/4, eb0, FreeEnd(:A2))
+    A3 = PolymerBlock(:A3, sA, 1/4, eb0, FreeEnd(:A3))
+    A4 = PolymerBlock(:A4, sA, 1/4, eb0, FreeEnd(:A4))
+    return BlockCopolymer(:A4, [A1, A2, A3, A4])
+end
+
+function starA5()
+    sA = KuhnSegment(:A)
+    eb0 = BranchPoint(:EB0)
+    A1 = PolymerBlock(:A1, sA, 1/5, eb0, FreeEnd(:A1))
+    A2 = PolymerBlock(:A2, sA, 1/5, eb0, FreeEnd(:A2))
+    A3 = PolymerBlock(:A3, sA, 1/5, eb0, FreeEnd(:A3))
+    A4 = PolymerBlock(:A4, sA, 1/5, eb0, FreeEnd(:A4))
+    A5 = PolymerBlock(:A5, sA, 1/5, eb0, FreeEnd(:A5))
+    return BlockCopolymer(:A5, [A1, A2, A3, A4, A5])
+end
+
+function starA6()
+    sA = KuhnSegment(:A)
+    eb0 = BranchPoint(:EB0)
+    A1 = PolymerBlock(:A1, sA, 1/6, eb0, FreeEnd(:A1))
+    A2 = PolymerBlock(:A2, sA, 1/6, eb0, FreeEnd(:A2))
+    A3 = PolymerBlock(:A3, sA, 1/6, eb0, FreeEnd(:A3))
+    A4 = PolymerBlock(:A4, sA, 1/6, eb0, FreeEnd(:A4))
+    A5 = PolymerBlock(:A5, sA, 1/6, eb0, FreeEnd(:A5))
+    A6 = PolymerBlock(:A6, sA, 1/6, eb0, FreeEnd(:A6))
+    return BlockCopolymer(:A6, [A1, A2, A3, A4, A5, A6])
 end
 
 function starAB3A3()
@@ -178,11 +289,19 @@ end
 
 abg = diblock_chain() |> BlockCopolymerGraph
 
+abag = linearABA() |> BlockCopolymerGraph
+
 branchg = branchAB() |> BlockCopolymerGraph
 
 semibranchg = branchAB(0.08, 0.12) |> BlockCopolymerGraph
 
 branch2g = branchAB2() |> BlockCopolymerGraph
+
+chainABCACDg = chainABCACD() |> BlockCopolymerGraph
+
+chainA6B6g = chainA6B6() |> BlockCopolymerGraph
+
+starA2B2g = starA2B2() |> BlockCopolymerGraph
 
 starAB3A3g = starAB3A3() |> BlockCopolymerGraph
 
@@ -193,3 +312,6 @@ starAB4A8g = starAB4A8() |> BlockCopolymerGraph
 starABCDOg = starABCDO() |> BlockCopolymerGraph
 
 starABCDO4g = starABCDO4() |> BlockCopolymerGraph
+
+# Prevent displaying last line in the REPL
+nothing
