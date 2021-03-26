@@ -5,6 +5,36 @@ using Polymer
 using LightGraphs
 using LightGraphs.Experimental
 
+include("types.jl")
+export
+    AbstractPolymerArchitecture,
+    NonCyclicArchitecture,
+    CyclicArchitecture,
+    LinearArchitecture,
+    BranchedArchitecture,
+    StarArchitecture,
+    CombArchitecture,
+    GeneralBranchedArchitecture,
+    RingArchitecture
+export
+    iscyclicchain,
+    isnoncyclicchain,
+    islinearchain
+
+include("graph.jl")
+export
+    BlockCopolymerGraph,
+    SPECIECOLORS
+export
+    build_graph,
+    node_styles,
+    edge_labels,
+    edge_styles,
+    plot_graph,
+    save_graph,
+    species,
+    chaintype
+
 include("subtree.jl")
 export
     Subtree,
