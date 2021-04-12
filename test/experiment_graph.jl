@@ -1,8 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.12.21
+# v0.14.0
 
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ 79fac120-7f2e-11eb-2007-a3bde9fad3f7
+using Pkg
+
+# ╔═╡ a3376b3a-7f2e-11eb-3c1b-b1fdf40461a5
+using Revise
 
 # ╔═╡ 5b913a92-7f20-11eb-1f10-b3059d07c947
 using Polymer
@@ -13,14 +19,8 @@ using LightGraphs
 # ╔═╡ 088b1254-7f21-11eb-0ab9-234397a05e9d
 using TikzGraphs, TikzPictures
 
-# ╔═╡ 79fac120-7f2e-11eb-2007-a3bde9fad3f7
-using Pkg
-
 # ╔═╡ f20867c8-8017-11eb-2b31-9b24a0235101
 using LightGraphs.Experimental
-
-# ╔═╡ a3376b3a-7f2e-11eb-3c1b-b1fdf40461a5
-using Revise
 
 # ╔═╡ 110d5194-824b-11eb-19c4-4991b80b89bc
 

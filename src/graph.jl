@@ -186,16 +186,16 @@ Base.show(io::IO, mime::MIME"image/svg+xml", g::BlockCopolymer) = show(io, mime,
 
 Similar to `show` method. But this method can configure extra options for plotting the block copolymer chain. It also return a `TikzPicture` object.
 """
-function plot_graph(g::BlockCopolymerGraph; colors=[], bends=[])
+function plot_graph(g::BlockCopolymerGraph; colors=[], bends=[], options="scale=3")
     return TikzGraphs.plot(g.graph,
                     node_styles=node_styles(g),
                     edge_labels=edge_labels(g),
                     edge_styles=edge_styles(g; colors=colors, bends=bends),
                     layout=Layouts.SpringElectrical(),
-                    options="scale=3")
+                    options=options)
 end
 
-plot_graph(g::BlockCopolymer; colors=[], bends=[]) = plot_graph(BlockCopolymerGraph(g); colors=colors, bends=bends)
+plot_graph(g::BlockCopolymer; colors=[], bends=[], options="scale=3") = plot_graph(BlockCopolymerGraph(g); colors=colors, bends=bends, options=options)
 
 """
     save_graph(f::TikzPictures.SaveType, g::BlockCopolymerGraph)

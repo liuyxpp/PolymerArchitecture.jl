@@ -284,7 +284,7 @@ function starABCDO4()
     X13 = PolymerBlock(:X13, sB, 0.08, eb[1], eb[3])
     X14 = PolymerBlock(:X14, sA, 0.08, eb[1], eb[4])
 
-    return BlockCopolymer(:ABCDO, [O1, O2, O3, O4, A2, A3, A4, B2, B3, C1, C2, C4, D3, D4, X12, X13, X14])
+    return BlockCopolymer(:ABCDO4, [O1, O2, O3, O4, A2, A3, A4, B2, B3, C1, C2, C4, D3, D4, X12, X13, X14])
 end
 
 abg = diblock_chain() |> BlockCopolymerGraph
