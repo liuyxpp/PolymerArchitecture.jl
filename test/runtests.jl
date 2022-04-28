@@ -1,7 +1,7 @@
 using PolymerArchitecture
 using Test
 
-using LightGraphs
+using Graphs
 using Polymer
 
 include("chains.jl")

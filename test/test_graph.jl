@@ -1,4 +1,4 @@
-using LightGraphs
+using Graphs
 
 @testset "graph.jl: BlockCopolymerGraph" begin
     chainAB = diblock_chain()
