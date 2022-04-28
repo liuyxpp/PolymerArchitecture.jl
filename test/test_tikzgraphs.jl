@@ -1,17 +1,25 @@
 ### A Pluto.jl notebook ###
-# v0.11.12
+# v0.19.2
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 50940824-edb5-11ea-1ae6-9bee2df52fd3
-using TikzPictures
+# ╔═╡ a16c7f48-fff0-497d-815d-fafb9c9a2bdf
+begin
+	import Pkg
+	Pkg.activate("..")
+	using Graphs
+	using Polymer
+	using PolymerArchitecture
+	using TikzPictures
+	using TikzGraphs
+end
 
-# ╔═╡ 7efbdc96-edb5-11ea-2167-59857741434e
-using TikzGraphs
+# ╔═╡ 5a4879bb-2b23-4463-b410-b80559e03d15
+include("chains.jl")
 
-# ╔═╡ 86a79bec-edb5-11ea-3ad1-61586fa95455
-using LightGraphs
+# ╔═╡ 540fb494-b27e-4d56-b854-27dfb6f1e638
+branchAB()
 
 # ╔═╡ 610245ea-edb5-11ea-2c63-072bdf57ae79
 tp = TikzPicture("\\draw (0,0) -- (10,10);\n\\draw (10,0) -- (0,10);\n\\node at (5,5) {tikz \$\\sqrt{\\pi}\$};", options="scale=0.25", preamble="")
@@ -119,10 +127,10 @@ begin
 end
 
 # ╔═╡ Cell order:
-# ╠═50940824-edb5-11ea-1ae6-9bee2df52fd3
+# ╠═a16c7f48-fff0-497d-815d-fafb9c9a2bdf
+# ╠═5a4879bb-2b23-4463-b410-b80559e03d15
+# ╠═540fb494-b27e-4d56-b854-27dfb6f1e638
 # ╠═610245ea-edb5-11ea-2c63-072bdf57ae79
-# ╠═7efbdc96-edb5-11ea-2167-59857741434e
-# ╠═86a79bec-edb5-11ea-3ad1-61586fa95455
 # ╠═8da31dfe-edb5-11ea-31f1-a99fbd18be84
 # ╠═97be7bd0-edb5-11ea-2c0f-2d942caa783b
 # ╠═9d57781c-edb5-11ea-3a3d-39da277ccf70
