@@ -2,8 +2,8 @@ module PolymerArchitecture
 
 using Polymer
 
-using LightGraphs
-using LightGraphs.Experimental
+using Graphs
+using Graphs.Experimental
 
 include("types.jl")
 export
