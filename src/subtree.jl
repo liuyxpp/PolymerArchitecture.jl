@@ -6,7 +6,7 @@ abstract type AbstractSubtree end
 An induced subgraph of the original graph. It has a special vertex which is named *front vertex*. A `Subtree` instance can be used to represent the sub-architecture of a non-cyclic block copolymer chain.
 
 ## Fields
-* `graph`: a LightGraphs object that describes the subtree.
+* `graph`: a Graphs object that describes the subtree.
 * `vmap`: an `AbstractVector` object whose indices are vertices of `Subtree.graph` and values are their corresponding vertices in the original graph.
 * `vmap`: an `AbstractVector` object which is a reverse of `vmap`.
 * `vi`: the internal index (i.e. vertex in `Subtree.graph`) of the front vertex. Value 0 means the front vertex is not set.
@@ -26,7 +26,7 @@ function _subtree(graph::AbstractGraph{T}, vmap::AbstractVector{T}, v::T=zero(T)
     return Subtree(graph, vmap, rvmap, vi, v)
 end
 
-function Subtree(graph::AbstractGraph{T}, vertices, v::T=zero(T)) where T
+function Subtree(graph::Graph, vertices, v=0)
     g, vm = induced_subgraph(graph, vertices)
     return _subtree(g, vm, v)
 end

@@ -21,18 +21,13 @@ export
     isnoncyclicchain,
     islinearchain
 
+include("edge.jl")
 include("graph.jl")
 export
     BlockCopolymerGraph,
     SPECIECOLORS
 export
     build_graph,
-    node_styles,
-    edge_labels,
-    edge_styles,
-    plot_graph,
-    save_graph,
-    species,
     chaintype
 
 include("subtree.jl")
