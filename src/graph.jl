@@ -97,12 +97,12 @@ end
 
 # Implement the AbstractGraph interface.
 Base.eltype(bcg::BlockCopolymerGraph) = eltype(bcg.graph)
-Graphs.has_edge(bcg::BlockCopolymerGraph, s, d) = has_edge(bcg.graph, s, d)
-Graphs.has_vertex(bcg::BlockCopolymerGraph, v) = has_vertex(bcg.graph, v)
-Graphs.inneighbors(bcg::BlockCopolymerGraph, v) = inneighbors(bcg.graph, v)
+Graphs.has_edge(bcg::BlockCopolymerGraph, s::Integer, d::Integer) = has_edge(bcg.graph, s, d)
+Graphs.has_vertex(bcg::BlockCopolymerGraph, v::Integer) = has_vertex(bcg.graph, v)
+Graphs.inneighbors(bcg::BlockCopolymerGraph, v::Integer) = inneighbors(bcg.graph, v)
 Graphs.ne(bcg::BlockCopolymerGraph) = ne(bcg.graph)
 Graphs.nv(bcg::BlockCopolymerGraph) = nv(bcg.graph)
-Graphs.outneighbors(bcg::BlockCopolymerGraph, v) = outneighbors(bcg.graph, v)
+Graphs.outneighbors(bcg::BlockCopolymerGraph, v::Integer) = outneighbors(bcg.graph, v)
 Graphs.vertices(bcg::BlockCopolymerGraph) = vertices(bcg.graph)
 Graphs.is_directed(bcg::BlockCopolymerGraph) = false
 Graphs.is_directed(bcg::Type{BlockCopolymerGraph}) = false

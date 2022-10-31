@@ -1,8 +1,6 @@
 using Polymer
-
-branchpoints(n, prefix="EB") = [BranchPoint(Symbol(prefix*string(i))) for i in 1:n]
-
-freeends(n, prefix="A") = [FreeEnd(Symbol(prefix*string(i))) for i in 1:n]
+using Polymer: branchpoints, freeends
+using PolymerArchitecture
 
 function linearABA(fA1=0.3, fA2=0.3, fB=0.4)
     sA = KuhnSegment(:A)
