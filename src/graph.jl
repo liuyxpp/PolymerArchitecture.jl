@@ -1,4 +1,5 @@
 import Graphs: AbstractGraph
+import Polymer: BlockCopolymer
 
 """
     BlockCopolymerGraph <: AbstractGraph{Int}
@@ -30,6 +31,10 @@ struct BlockCopolymerGraph <: AbstractGraph{Int}
 end
 
 Polymer.species(bcg::BlockCopolymerGraph) = [specie(b) for b in keys(bcg.block2edge)] |> unique |> sort
+
+function BlockCopolymer(bcg::BlockCopolymerGraph; label=:BlockCopolymer)
+    return BlockCopolymer(label, collect(keys(bcg.block2edge)))
+end
 
 """
     build_graph(c::BlockCopolymer)
@@ -125,7 +130,7 @@ end
 
 Graphs.weights(bcg::BlockCopolymerGraph) = bcg.distmx
 
-Base.show(io::IO, bcg::BlockCopolymerGraph) = print(io, "BlockCopolymerGraph as a graph object: $(bcg.graph)")
+Base.show(io::IO, bcg::BlockCopolymerGraph) = print(io, "BlockCopolymer as a graph object: $(bcg.graph)")
 
 """
     chaintype(g::BlockCopolymer)
