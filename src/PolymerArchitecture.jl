@@ -68,4 +68,11 @@ export
     process_semi_equivalent_subtree_group,
     process_semi_equivalent_subtrees
 
+import SnoopPrecompile
+
+SnoopPrecompile.@precompile_all_calls begin
+    AB = diblock_chain()
+    ABG = BlockCopolymerGraph(AB)
+end
+
 end # module
