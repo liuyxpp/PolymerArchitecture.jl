@@ -36,7 +36,7 @@ end
 Subtree(bcg::BlockCopolymerGraph, vertices, v=0) = Subtree(bcg.graph, vertices, v)
 
 function ==(t1::Subtree, t2::Subtree)
-    return length(t1.vmap) == length(t2.vmap) && Set(t1.vmap) == Set(t2.vmap) && t1.graph == t2.graph
+    return length(t1.vmap) == length(t2.vmap) && Set(t1.vmap) == Set(t2.vmap)
 end
 
 function ∈(t::Subtree, ts::Set{<:Subtree})
