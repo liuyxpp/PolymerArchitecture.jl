@@ -63,9 +63,9 @@ export
     process_isolated_isomorphic_subtrees,
     process_equivalent_subtrees,
     process_leaf,
-    can_merge_eq,
-    merge_elements_eq,
-    all_distinct_eq,
+    can_merge,
+    merge_elements,
+    all_distinct,
     find_all_equivalent_subtrees
 
 include("semi_equivalent.jl")
@@ -73,7 +73,8 @@ export
     group_isomorphic_branches,
     group_semi_equivalent_subtrees,
     process_semi_equivalent_subtree_group,
-    process_semi_equivalent_subtrees
+    process_semi_equivalent_subtrees,
+    find_all_semi_equivalent_subtrees
 
 import SnoopPrecompile
 

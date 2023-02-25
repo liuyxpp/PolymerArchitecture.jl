@@ -143,10 +143,8 @@ function process_semi_equivalent_subtree_group(::Val{2}, bcg::BlockCopolymerGrap
     newbranches2, branch21 = _find_branches(bcg, subtree2, subtree1)
     bgroups1 = group_isomorphic_branches(bcg, newbranches1)
     bgroups2 = group_isomorphic_branches(bcg, newbranches2)
-    for i in 1:length(bgroups1)
-        bgroup1 = bgroups1[i]
-        for j in 1:length(bgroups2)
-            bgroup2 = bgroups2[j]
+    for bgroup1 in bgroups1
+        for bgroup2 in bgroups2
             if is_isomorphic_subtree(bcg, first(bgroup1), first(bgroup2))
                 # Only including minimum number of isomorphic branches
                 p = min(length(bgroup1), length(bgroup2))
@@ -226,19 +224,41 @@ function process_semi_equivalent_subtrees(bcg::BlockCopolymerGraph, subtrees)
     isomorphic_subtrees = [subtrees]
     while length(isomorphic_subtrees) > 0
         tree_groups = []
-        for i in 1:length(isomorphic_subtrees)
-            trees = isomorphic_subtrees[i]
+        for trees in isomorphic_subtrees
             tgroups = group_semi_equivalent_subtrees(bcg, trees)
             append!(tree_groups, tgroups)
         end
 
         isomorphic_subtrees = []
-        for i in 1:length(tree_groups)
-            ss, is = process_semi_equivalent_subtree_group(bcg, tree_groups[i])
+        for tree_group in tree_groups
+            ss, is = process_semi_equivalent_subtree_group(bcg, tree_group)
             (length(ss) > 0) && append!(semi_equivalent_subtrees, ss)
             (length(is) > 0) && append!(isomorphic_subtrees, is)
         end
     end
 
     return semi_equivalent_subtrees
+end
+
+function find_all_semi_equivalent_subtrees(g::BlockCopolymerGraph)
+    leafs = all_leafs(g)
+    semi_equivalent_trees = Set{<:Subtree}[]
+    for leaf in leafs
+        es, ss = process_leaf(g, leaf)
+        isempty(ss) && continue
+        for strees in ss
+            isempty(strees) && continue
+            push!(semi_equivalent_trees, Set([t for t in strees]))
+        end
+    end
+
+    out = Set{<:Subtree}[]
+    for ss in merge_elements(g, semi_equivalent_trees)
+        ss_vec = process_semi_equivalent_subtrees(g, collect(ss))
+        for strees in ss_vec
+            push!(out, Set([t for t in strees]))
+        end
+    end
+
+    return merge_elements(g, out)
 end
