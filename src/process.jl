@@ -250,7 +250,7 @@ function process_leaf(bcg::BlockCopolymerGraph, v)
     return equivalent_subtrees, semi_equivalent_subtrees
 end
 
-function can_merge_eq(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Subtree})
+function can_merge(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Subtree})
     length(ts1) == length(ts2) || return false
     t1 = first(ts1)
     t1 ∈ ts2 && return true
@@ -258,8 +258,8 @@ function can_merge_eq(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Su
     return is_equivalent_subtree(g, t1, t2, check=true)
 end
 
-function merge_elements_eq(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Subtree})
-    can_merge_eq(g, ts1, ts2) || return (ts1, ts2)
+function merge_elements(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Subtree})
+    can_merge(g, ts1, ts2) || return (ts1, ts2)
 
     out = deepcopy(ts1)
     for t2 in ts2
@@ -269,31 +269,31 @@ function merge_elements_eq(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set
     return (out,)
 end
 
-function all_distinct_eq(g::BlockCopolymerGraph, vts::Vector{Set{<:Subtree}})
+function all_distinct(g::BlockCopolymerGraph, vts::Vector{Set{<:Subtree}})
     isempty(vts) && return true
     length(vts) == 1 && return true
 
     for i in 1:length(vts)
         for j in i+1:length(vts)
-            can_merge_eq(g, vts[i], vts[j]) && return false
+            can_merge(g, vts[i], vts[j]) && return false
         end
     end
 
     return true
 end
 
-function merge_elements_eq(g::BlockCopolymerGraph, vts::Vector{Set{<:Subtree}})
+function merge_elements(g::BlockCopolymerGraph, vts::Vector{Set{<:Subtree}})
     (length(vts) <= 1) && return vts
 
     temp = Set{<:Subtree}[]
     out = deepcopy(vts)
     merged = fill(false, length(vts))
-    while !all_distinct_eq(g, out)
+    while !all_distinct(g, out)
         for i in 1:length(out)
             merged[i] && continue
             for j in i+1:length(out)
                 merged[j] && continue
-                res = merge_elements_eq(g, out[i], out[j])
+                res = merge_elements(g, out[i], out[j])
                 if length(res) == 1
                     push!(temp, res[1])
                     merged[i] = true
@@ -320,11 +320,12 @@ function find_all_equivalent_subtrees(g::BlockCopolymerGraph)
         es, ss = process_leaf(g, leaf)
         isempty(es) && continue
         for etrees in es
+            isempty(etrees) && continue
             push!(equivalent_trees, Set([t for t in etrees]))
         end
     end
 
-    equivalent_trees = merge_elements_eq(g, equivalent_trees)
+    equivalent_trees = merge_elements(g, equivalent_trees)
 
     return equivalent_trees
 end
