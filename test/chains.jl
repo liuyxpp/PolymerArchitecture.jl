@@ -162,6 +162,17 @@ function starA6()
     return BlockCopolymer(:A6, [A1, A2, A3, A4, A5, A6])
 end
 
+function starAB3()
+    sA = KuhnSegment(:A)
+    sB = KuhnSegment(:B)
+    eb0 = BranchPoint(:EB0)
+    A = PolymerBlock(:A, sA, 0.4, FreeEnd(:A), eb0)
+    B1 = PolymerBlock(:B1, sB, 0.2, FreeEnd(:B1), eb0)
+    B2 = PolymerBlock(:B2, sB, 0.2, FreeEnd(:B2), eb0)
+    B3 = PolymerBlock(:B3, sB, 0.2, FreeEnd(:B3), eb0)
+    return BlockCopolymer(:AB3, [A, B1, B2, B3])
+end
+
 function starAB3A3()
     sA = KuhnSegment(:A)
     sB = KuhnSegment(:B)
@@ -196,7 +207,7 @@ function starAB3A6()
     B1 = PolymerBlock(:B1, sB, 0.12, eb1, eb0)
     B2 = PolymerBlock(:B2, sB, 0.12, eb2, eb0)
     B3 = PolymerBlock(:B3, sB, 0.06, eb3, eb0)
-    return BlockCopolymer(:AB3A3, [A, B1, B2, B3, A1, A2, A3, A4, A5, A6])
+    return BlockCopolymer(:AB3A6, [A, B1, B2, B3, A1, A2, A3, A4, A5, A6])
 end
 
 function starAB4A8()

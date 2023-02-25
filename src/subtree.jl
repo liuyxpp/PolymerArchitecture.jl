@@ -1,3 +1,5 @@
+import Base: ==, ∈
+
 abstract type AbstractSubtree end
 
 """
@@ -26,12 +28,23 @@ function _subtree(graph::AbstractGraph{T}, vmap::AbstractVector{T}, v::T=zero(T)
     return Subtree(graph, vmap, rvmap, vi, v)
 end
 
-function Subtree(graph::Graph, vertices, v=0)
+function Subtree(graph::AbstractGraph, vertices, v=0)
     g, vm = induced_subgraph(graph, vertices)
     return _subtree(g, vm, v)
 end
 
 Subtree(bcg::BlockCopolymerGraph, vertices, v=0) = Subtree(bcg.graph, vertices, v)
+
+function ==(t1::Subtree, t2::Subtree)
+    return length(t1.vmap) == length(t2.vmap) && Set(t1.vmap) == Set(t2.vmap) && t1.graph == t2.graph
+end
+
+function ∈(t::Subtree, ts::Set{<:Subtree})
+    for t1 in ts
+        (t == t1) && return true
+    end
+    return false
+end
 
 """
     front_vertex(subtree)

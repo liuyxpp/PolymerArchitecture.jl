@@ -55,11 +55,18 @@ export
 
 include("process.jl")
 export
+    is_leaf_node,
+    is_leaf_edge,
+    all_leafs,
     group_isomorphic_subtrees,
     process_isomorphic_subtree_groups,
     process_isolated_isomorphic_subtrees,
     process_equivalent_subtrees,
-    process_leaf
+    process_leaf,
+    can_merge_eq,
+    merge_elements_eq,
+    all_distinct_eq,
+    find_all_equivalent_subtrees
 
 include("semi_equivalent.jl")
 export
