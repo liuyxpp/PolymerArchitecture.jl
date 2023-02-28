@@ -66,7 +66,13 @@ export
     can_merge,
     merge_elements,
     all_distinct,
-    find_all_equivalent_subtrees
+    find_all_equivalent_subtrees,
+    list_edges_by_order,
+    list_edges_by_order!,
+    vertex_mapping,
+    apply_mapping,
+    unique_blocks,
+    group_equivalent_blocks
 
 include("semi_equivalent.jl")
 export

@@ -46,6 +46,8 @@ function ∈(t::Subtree, ts::Set{<:Subtree})
     return false
 end
 
+Base.eltype(st::Subtree) = eltype(st.graph)
+
 """
     front_vertex(subtree)
 
