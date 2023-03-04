@@ -55,18 +55,32 @@ export
 
 include("process.jl")
 export
+    is_leaf_node,
+    is_leaf_edge,
+    all_leafs,
     group_isomorphic_subtrees,
     process_isomorphic_subtree_groups,
     process_isolated_isomorphic_subtrees,
     process_equivalent_subtrees,
-    process_leaf
+    process_leaf,
+    can_merge,
+    merge_elements,
+    all_distinct,
+    find_all_equivalent_subtrees,
+    list_edges_by_order,
+    list_edges_by_order!,
+    vertex_mapping,
+    apply_mapping,
+    unique_blocks,
+    group_equivalent_blocks
 
 include("semi_equivalent.jl")
 export
     group_isomorphic_branches,
     group_semi_equivalent_subtrees,
     process_semi_equivalent_subtree_group,
-    process_semi_equivalent_subtrees
+    process_semi_equivalent_subtrees,
+    find_all_semi_equivalent_subtrees
 
 import SnoopPrecompile
 

@@ -1,3 +1,13 @@
+is_leaf_node(g::AbstractGraph, v) = length(neighbors(g, v)) == 1
+
+function is_leaf_edge(g::AbstractGraph, e::AbstractEdge)
+    return is_leaf_node(g, src(e)) || is_leaf_node(g, dst(e))
+end
+
+function all_leafs(g::AbstractGraph)
+    return [v for v in vertices(g) if is_leaf_node(g, v)]
+end
+
 """
     group_isomorphic_subtrees(BlockCopolymerGraph, subtree)
 
@@ -208,7 +218,7 @@ function process_leaf(bcg::BlockCopolymerGraph, v)
     subtree = Subtree(bcg.graph, [v, vnext], vnext)
 
     n = count_isomorphic_subtree(bcg, subtree)
-    (n == 1) && return [], [], [], []
+    (n == 1) && return [], []
 
     subtrees = all_isomorphic_subtree(bcg, subtree)
     isomorphic_subtrees_list = [subtrees]
@@ -239,3 +249,212 @@ function process_leaf(bcg::BlockCopolymerGraph, v)
 
     return equivalent_subtrees, semi_equivalent_subtrees
 end
+
+function can_merge(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Subtree})
+    length(ts1) == length(ts2) || return false
+    t1 = first(ts1)
+    t1 ∈ ts2 && return true
+    t2 = first(ts2)
+    return is_equivalent_subtree(g, t1, t2, check=true)
+end
+
+function merge_elements(g::BlockCopolymerGraph, ts1::Set{<:Subtree}, ts2::Set{<:Subtree})
+    can_merge(g, ts1, ts2) || return (ts1, ts2)
+
+    out = deepcopy(ts1)
+    for t2 in ts2
+        t2 ∈ ts1 || push!(out, t2)
+    end
+
+    return (out,)
+end
+
+function all_distinct(g::BlockCopolymerGraph, vts::Vector{Set{<:Subtree}})
+    isempty(vts) && return true
+    length(vts) == 1 && return true
+
+    for i in 1:length(vts)
+        for j in i+1:length(vts)
+            can_merge(g, vts[i], vts[j]) && return false
+        end
+    end
+
+    return true
+end
+
+function merge_elements(g::BlockCopolymerGraph, vts::Vector{Set{<:Subtree}})
+    (length(vts) <= 1) && return vts
+
+    temp = Set{<:Subtree}[]
+    out = deepcopy(vts)
+    merged = fill(false, length(vts))
+    while !all_distinct(g, out)
+        for i in 1:length(out)
+            merged[i] && continue
+            for j in i+1:length(out)
+                merged[j] && continue
+                res = merge_elements(g, out[i], out[j])
+                if length(res) == 1
+                    push!(temp, res[1])
+                    merged[i] = true
+                    merged[j] = true
+                end
+            end
+        end
+        for i in 1:length(out)
+            !merged[i] && push!(temp, vts[i])
+        end
+        empty!(out)
+        append!(out, temp)
+        empty!(temp)
+        merged = fill(false, length(out))
+    end
+
+    return out
+end
+
+function find_all_equivalent_subtrees(g::BlockCopolymerGraph)
+    leafs = all_leafs(g)
+    equivalent_trees = Set{<:Subtree}[]
+    for leaf in leafs
+        es, ss = process_leaf(g, leaf)
+        isempty(es) && continue
+        for etrees in es
+            isempty(etrees) && continue
+            push!(equivalent_trees, Set([t for t in etrees]))
+        end
+    end
+
+    equivalent_trees = merge_elements(g, equivalent_trees)
+
+    return equivalent_trees
+end
+
+find_all_equivalent_subtrees(p::BlockCopolymer) = find_all_equivalent_subtrees(BlockCopolymerGraph(p))
+
+function list_edges_by_order!(edges::Vector{<:Edge}, st::Subtree, v, vp)
+    for vx in neighbors(st.graph, v)
+        (vx == vp) && continue
+        e = Edge(st.vmap[vx], st.vmap[v])
+        push!(edges, e)
+        is_leaf_node(st.graph, vx) || list_edges_by_order!(edges, st, vx, v)
+    end
+end
+
+"""
+    list_edges_by_order(st::Subtree)
+
+List all edges in a subtree via a depth-first traversal starting from the front vertex of the input subtree. The return value is a vector of `Edge` instance. The node values in the returned edges are in the convention of original BlockCopolymerGraph.  
+"""
+function list_edges_by_order(st::Subtree)
+    edges = Edge[]
+    list_edges_by_order!(edges, st, st.vi, nothing)
+    return edges
+end
+
+"""
+    vertex_mapping(g::BlockCopolymerGraph, es1::Subtree, es2::Subtree)
+
+Return a mapping of nodes for two equivalent subtrees. Since equivalent subtrees are isomorphic. Given two subtrees G and H, this method identify a mapping f: u -> v, where u is a node in G and v is a node in v.
+"""
+function vertex_mapping(g::BlockCopolymerGraph, es1::Subtree, es2::Subtree)
+    vertex_relation = (v1, v2) -> equivalent_blockend(g, v1, v2, es1.vmap, es2.vmap)
+    edge_relation = (e1, e2) -> equivalent_block(g, e1, e2, es1.vmap, es2.vmap)
+    ichannel = all_isomorph(es1.graph, es2.graph; vertex_relation, edge_relation)
+    internal_mapping = collect(ichannel)[1]
+    T = eltype(g)
+    vmap = Dict{T,T}()
+    for (v1, v2) in internal_mapping
+        vmap[es1.vmap[v1]] = es2.vmap[v2]
+    end
+    return vmap
+end
+
+"""
+    apply_mapping(vmap, edges::Vector{<:Edge})
+
+Apply the mapping identified by the method `vertex_mapping` to convert a list of edges in a subtree to another list of edges in its equivalent subtree. The input argument `vmap` is computed from `vertex_mapping` using subtree1 and subtree2.
+"""
+function apply_mapping(vmap, edges::Vector{<:Edge})
+    return [Edge(vmap[e.src], vmap[e.dst]) for e in edges]
+end
+
+"""
+    unique_blocks(eqblock_list::Vector{Vector{Pair{V,V}}}) where V
+
+Remove identical equivalent blocks in the list. This case occurs when two equivalent subtrees have a common edge. For example, if the common edge is Edge(7,8), it will produce [[7=>8, 8=>7], [8=>7, 7=>8]]. Therefore, we have to remove one of these to eliminate duplication.
+"""
+function unique_blocks(eqblock_list::Vector{Vector{Pair{V,V}}}) where V
+    same_blocks = Pair{V, V}[]
+    unique_eqblock_list = Vector{Pair{V,V}}[]
+    for eqblocks in eqblock_list
+        if length(eqblocks) != 2
+            push!(unique_eqblock_list, eqblocks)
+            continue
+        end
+        b1, b2 = eqblocks
+        if (b1 == reverse(b2))
+            if b1 ∉ same_blocks
+                push!(same_blocks, b1)
+                push!(same_blocks, b2)
+                push!(unique_eqblock_list, eqblocks)
+            end
+        else
+            push!(unique_eqblock_list, eqblocks)
+        end
+    end
+
+    return unique_eqblock_list
+end
+
+"""
+    group_equivalent_blocks(bc::BlockCopolymer)
+
+Group equivalent blocks into a vector of block groups. For blocks in the same group, they share a single propagator. The typical usage of this method is to reduce the computational cost of SCFT calculations.
+"""
+function group_equivalent_blocks(bcg::BlockCopolymerGraph)
+    if nv(bcg) == 2
+        v1, v2 = vertices(bcg)
+        return [[v1=>v2, v2=>v1]]
+    end
+
+    V = eltype(bcg)
+    es_list = find_all_equivalent_subtrees(bcg)
+    eqblock_list = Vector{Pair{V,V}}[]
+    for es in es_list
+        ess = collect(es)
+        idx0 = length(eqblock_list) + 1
+        edges = list_edges_by_order(ess[1])
+        for e in edges
+            v1, v2 = src(e), dst(e)
+            push!(eqblock_list, [v1=>v2])
+            push!(eqblock_list, [v2=>v1])
+        end
+        length(ess) == 1 && continue
+        for et in ess[2:end]
+            idx = idx0
+            vmap = vertex_mapping(bcg, ess[1], et)
+            edgesx = apply_mapping(vmap, edges)
+            for e in edgesx
+                v1, v2 = src(e), dst(e)
+                push!(eqblock_list[idx], v1=>v2)
+                push!(eqblock_list[idx+1], v2=>v1)
+                idx += 2 
+            end
+        end
+    end
+
+    eqblock_list = unique_blocks(eqblock_list)
+    flat_eqblock_list = isempty(eqblock_list) ? [] : reduce(vcat, eqblock_list)
+    for e in keys(bcg.edge2block)
+        v1, v2 = e
+        if (v1=>v2) ∉ flat_eqblock_list
+            push!(eqblock_list, [v1=>v2])
+            push!(eqblock_list, [v2=>v1])
+        end
+    end
+
+    return eqblock_list
+end
+
+group_equivalent_blocks(bc::BlockCopolymer) = group_equivalent_blocks(BlockCopolymerGraph(bc))
