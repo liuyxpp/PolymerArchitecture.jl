@@ -24,6 +24,7 @@ export
 include("edge.jl")
 include("graph.jl")
 export
+    SmallMoleculeGraph,
     BlockCopolymerGraph,
     SPECIECOLORS
 export
