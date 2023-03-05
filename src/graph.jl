@@ -1,5 +1,16 @@
 import Graphs: AbstractGraph
-import Polymer: BlockCopolymer
+import Polymer: BlockCopolymer, SmallMolecule
+
+"""
+    SmallMoleculeGraph <: AbstractGraph{Int}
+
+A graph type for SmallMolecule object. Currently, small molecule has no structure. In the future, we may add more information to the graph.
+"""
+struct SmallMoleculeGraph <: AbstractGraph{Int}
+    molecule::SmallMolecule
+
+    SmallMoleculeGraph(sm::SmallMolecule) = new(sm)
+end
 
 """
     BlockCopolymerGraph <: AbstractGraph{Int}
@@ -7,6 +18,7 @@ import Polymer: BlockCopolymer
 A graph representation of a `Polymer.BlockCopolymerGraph` object by treating each block end as a vetex and each block as an edge. The block length is assigned to the weights for corresponding edge. see [`build_graph`](@ref) for more details.
 """
 struct BlockCopolymerGraph <: AbstractGraph{Int}
+    molecule::BlockCopolymer
     graph::SimpleGraph
     block2edge::Dict{PolymerBlock, Tuple{Int, Int}}
     edge2block::Dict{Tuple{Int, Int}, PolymerBlock}
@@ -16,17 +28,17 @@ struct BlockCopolymerGraph <: AbstractGraph{Int}
     node2free::Dict{Int, FreeEnd}
     distmx::Matrix{<:Real}
 
-    function BlockCopolymerGraph(c::BlockCopolymer)
-        g, d1, d2, d3 = build_graph(c)
+    function BlockCopolymerGraph(bc::BlockCopolymer)
+        g, d1, d2, d3 = build_graph(bc)
         rd1 = reverse_dict(d1)
         rd2 = reverse_dict(d2)
         rd3 = reverse_dict(d3)
-        distmx = zeros(typeof(first(c.blocks).f), nv(g), nv(g))
+        distmx = zeros(typeof(first(bc.blocks).f), nv(g), nv(g))
         for (e, block) in rd1
             distmx[e[1], e[2]] = block.f
             distmx[e[2], e[1]] = block.f
         end
-        new(g, d1, rd1, d2, rd2, d3, rd3, distmx)
+        new(bc, g, d1, rd1, d2, rd2, d3, rd3, distmx)
     end
 end
 
