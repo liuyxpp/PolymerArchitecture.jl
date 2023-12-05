@@ -88,7 +88,7 @@ function process_isolated_isomorphic_subtrees(bcg::BlockCopolymerGraph, subtrees
 
     if m == 1
         # Here subtrees = [subtree]
-        push!(semi_equivalent_subtress, subtrees)
+        push!(semi_equivalent_subtrees, subtrees)
     end
 
     if m == 2
