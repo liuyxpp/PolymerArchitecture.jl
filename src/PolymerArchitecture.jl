@@ -83,11 +83,14 @@ export
     process_semi_equivalent_subtrees,
     find_all_semi_equivalent_subtrees
 
-import SnoopPrecompile
+import PrecompileTools: @setup_workload, @compile_workload
 
-SnoopPrecompile.@precompile_all_calls begin
+@setup_workload begin
     AB = diblock_chain()
     ABG = BlockCopolymerGraph(AB)
+    @compile_workload begin
+        group_equivalent_blocks(AB)
+    end
 end
 
 end # module

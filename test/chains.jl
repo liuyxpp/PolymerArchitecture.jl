@@ -228,7 +228,7 @@ function starAB4A8()
     B1 = PolymerBlock(:B1, sB, 0.1, eb[2], eb[1])
     B2 = PolymerBlock(:B2, sB, 0.04, eb[3], eb[1])
     B3 = PolymerBlock(:B3, sB, 0.1, eb[4], eb[1])
-    B4 = PolymerBlock(:B3, sB, 0.04, eb[5], eb[1])
+    B4 = PolymerBlock(:B4, sB, 0.04, eb[5], eb[1])
     return BlockCopolymer(:AB4A8, [A, B1, B2, B3, B4, A1, A2, A3, A4, A5, A6, A7, A8])
 end
 
