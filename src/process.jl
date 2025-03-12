@@ -459,6 +459,12 @@ function group_equivalent_blocks(bcg::BlockCopolymerGraph)
 end
 =#
 
+"""
+    bfs_path(graph, start, goal; print_level = false) 
+
+Generate breadth-first search paths starting from all leaf vertices towards one goal vertex. 
+"""
+
 function bfs_path(graph, start, goal; print_level = false)
     predecessor = Dict{Int, Int}() #前驱顶点
     visited = Set{Int}() #已访问顶点
@@ -499,6 +505,11 @@ function bfs_path(graph, start, goal; print_level = false)
     reverse(path)
 end
 
+"""
+    dependency_list(graph, pair::Pair{Int, Int})
+
+Find all dependent propagators for a certain propagator (pair).
+"""
 function dependency_list(graph, pair::Pair{Int, Int})
     src, dst = pair[1], pair[2]
     list = Pair{Int, Int}[]
@@ -508,6 +519,11 @@ function dependency_list(graph, pair::Pair{Int, Int})
     return list
 end
 
+"""
+    equiv_pair(graph, pair1, pair2)
+
+Determine whether two propagators (pair1 and pair2) are equivalent. 
+"""
 function equiv_pair(graph, pair1, pair2)
     block1 = graph.edge2block[Polymer._sort_tuple2((pair1[1], pair1[2]))]
     block2 = graph.edge2block[Polymer._sort_tuple2((pair2[1], pair2[2]))]
@@ -517,6 +533,11 @@ function equiv_pair(graph, pair1, pair2)
     return false
 end
 
+"""
+    is_equivalent_dependency_sets(graph, list1, list2, equivalent_list)
+
+Determine whether two dependency_lists (list1 and list2) are equivalent. A dict (equivalent_list) encompassing all of the equiv pairs is used.
+"""
 function is_equivalent_dependency_sets(graph, list1, list2, equivalent_list)
     n1, n2 = length(list1), length(list2)
     correct_matrix = fill(-1, n1, n2)
@@ -545,6 +566,11 @@ function is_equivalent_dependency_sets(graph, list1, list2, equivalent_list)
     return false
 end
 
+"""
+    is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
+
+Determine whether two blocks (pair1 and pair2) are equivalent. 
+"""
 function is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
     list1 = dependency_list(graph, pair1)
     list2 = dependency_list(graph, pair2)
@@ -558,6 +584,11 @@ function is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
     return false
 end
 
+"""
+    find_computation_sequence(graph, goal_vertex)
+
+Get the computation sequence for all propagators. 
+"""
 function find_computation_sequence(graph, goal_vertex)    
     forward_paths = []
     backward_paths = []
@@ -627,6 +658,11 @@ function find_computation_sequence(graph, goal_vertex)
     return all_blocks, visited, output_sequence
 end
 
+"""
+    find_equiv_blocks(graph, goal_vertex)
+
+Get the equivalent_list. 
+"""
 function find_equiv_blocks(graph, goal_vertex)
     all_blocks, visited, sequence = find_computation_sequence(graph, goal_vertex)  
     equivalent_list = []
@@ -707,6 +743,11 @@ function find_computation_sequence(graph)
     return sequence
 end
 
+"""
+    group_equiv_blocks(graph)
+
+Determin the optimal choice of goal vertex and produce the optimized scheme. 
+"""
 function group_equiv_blocks(graph)
     groups_dict = Dict()
     front_vertices = collect(values(graph.joint2node))
