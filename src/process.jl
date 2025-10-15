@@ -344,7 +344,7 @@ end
 """
     list_edges_by_order(st::Subtree)
 
-List all edges in a subtree via a depth-first traversal starting from the front vertex of the input subtree. The return value is a vector of `Edge` instance. The node values in the returned edges are in the convention of original BlockCopolymerGraph.  
+List all edges in a subtree via a depth-first traversal starting from the front vertex of the input subtree. The return value is a vector of `Edge` instance. The node values in the returned edges are in the convention of original BlockCopolymerGraph.
 """
 function list_edges_by_order(st::Subtree)
     edges = Edge[]
@@ -408,11 +408,11 @@ function unique_blocks(eqblock_list::Vector{Vector{Pair{V,V}}}) where V
 end
 
 """
-    group_equivalent_blocks(bc::BlockCopolymer)
+    group_equivalent_blocks_isomorph(bc::BlockCopolymer)
 
-Group equivalent blocks into a vector of block groups. For blocks in the same group, they share a single propagator. The typical usage of this method is to reduce the computational cost of SCFT calculations.
+Group equivalent blocks into a vector of block groups via isomorphic graph approach. For blocks in the same group, they share a single propagator. The typical usage of this method is to reduce the computational cost of SCFT calculations.
 """
-function group_equivalent_blocks(bcg::BlockCopolymerGraph)
+function group_equivalent_blocks_isomorph(bcg::BlockCopolymerGraph)
     if nv(bcg) == 2
         v1, v2 = vertices(bcg)
         return [[v1=>v2, v2=>v1]]
@@ -439,7 +439,7 @@ function group_equivalent_blocks(bcg::BlockCopolymerGraph)
                 v1, v2 = src(e), dst(e)
                 push!(eqblock_list[idx], v1=>v2)
                 push!(eqblock_list[idx+1], v2=>v1)
-                idx += 2 
+                idx += 2
             end
         end
     end
@@ -457,4 +457,355 @@ function group_equivalent_blocks(bcg::BlockCopolymerGraph)
     return eqblock_list
 end
 
-group_equivalent_blocks(bc::BlockCopolymer) = group_equivalent_blocks(BlockCopolymerGraph(bc))
+group_equivalent_blocks_isomorph(bc::BlockCopolymer) = group_equivalent_blocks(BlockCopolymerGraph(bc))
+
+"""
+    bfs_path(graph, start, goal; print_level = false)
+
+Generate breadth-first search paths starting from all leaf vertices towards one goal vertex.
+"""
+function bfs_path(graph, start, goal; print_level = false)
+    predecessor = Dict{Int, Int}() #前驱顶点
+    visited = Set{Int}() #已访问顶点
+    queue = [start] #顶点队列
+    push!(visited, start)
+
+    level = 0  # 当前搜索层次
+    print_level && println("Level $level: $queue")  # 当前层次的顶点
+
+    while !isempty(queue)
+        level += 1
+        current_size = length(queue)
+        for i in 1:current_size
+            current = popfirst!(queue) # 移除并获取第一个顶点 current
+            if current == goal
+                break
+            end
+            for neighbor in neighbors(graph, current)
+                if !(neighbor in visited)
+                    push!(queue, neighbor)
+                    push!(visited, neighbor)
+                    predecessor[neighbor] = current # 前驱顶点为 current
+                end
+            end
+        end
+        print_level && println("Level $level: $queue")  # 输出当前层次的节点
+    end
+
+    # 重建路径
+    if !(haskey(predecessor, goal))
+        return nothing
+    end
+
+    path = [goal]
+    while path[end] != start
+        push!(path, predecessor[path[end]])
+    end
+    reverse(path)
+end
+
+"""
+    dependency_list(graph, pair::Pair{Int, Int})
+
+Find all dependent propagators for a certain propagator (pair).
+"""
+function dependency_list(graph, pair::Pair{Int, Int})
+    src, dst = pair[1], pair[2]
+    list = Pair{Int, Int}[]
+    for neighbor in neighbors(graph, src)
+        !(neighbor == dst) && push!(list, neighbor=>src)
+    end
+    return list
+end
+
+"""
+    equiv_pair(graph, pair1, pair2)
+
+Determine whether two propagators (pair1 and pair2) are equivalent.
+"""
+function equiv_pair(graph, pair1, pair2)
+    block1 = graph.edge2block[Polymer._sort_tuple2((pair1[1], pair1[2]))]
+    block2 = graph.edge2block[Polymer._sort_tuple2((pair2[1], pair2[2]))]
+    if block1.segment == block2.segment && block1.f == block2.f
+        return true
+    end
+    return false
+end
+
+"""
+    is_equivalent_dependency_sets(graph, list1, list2, equivalent_list)
+
+Determine whether two dependency_lists (list1 and list2) are equivalent. A dict (equivalent_list) encompassing all of the equiv pairs is used.
+"""
+function is_equivalent_dependency_sets(graph, list1, list2, equivalent_list)
+    n1, n2 = length(list1), length(list2)
+    correct_matrix = fill(-1, n1, n2)
+    list1 = collect(list1)
+    list2 = collect(list2)
+
+    for index1 in 1:n1
+        for index2 in 1:n2
+            test_set = Set([list1[index1], list2[index2]])
+            for equiv_set in equivalent_list
+                if issubset(test_set, equiv_set) || length(test_set) == 1
+                    if correct_matrix[index1, index2] == -1
+                        correct_matrix[index1, index2] = 1
+                        correct_matrix[index1, :] .= replace(correct_matrix[index1, :], -1 => 0)
+                        correct_matrix[:, index2] .= replace(correct_matrix[:, index2], -1 => 0)
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    if sum(correct_matrix) == n1
+        return true
+    end
+    return false
+end
+
+"""
+    is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
+
+Determine whether two blocks (pair1 and pair2) are equivalent.
+"""
+function is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
+    list1 = dependency_list(graph, pair1)
+    list2 = dependency_list(graph, pair2)
+    if length(list1) == length(list2) && equiv_pair(graph, pair1, pair2)
+        if isempty(list1)
+            return true
+        elseif is_equivalent_dependency_sets(graph, list1, list2, equivalent_list)
+            return true
+        end
+    end
+    return false
+end
+
+"""
+    find_computation_sequence(graph, goal_vertex)
+
+Get the computation sequence for all propagators.
+"""
+function find_computation_sequence(graph, goal_vertex)
+    forward_paths = []
+    backward_paths = []
+    all_blocks = []
+    visited = Set()
+
+    for edge in collect(edges(graph))
+        v1, v2 = edge.src, edge.dst
+        push!(all_blocks, v1=>v2)
+        push!(all_blocks, v2=>v1)
+    end
+
+    nblocks = div(length(all_blocks), 2)
+
+    for leaf_vertex in all_leafs(graph)
+        forward_path = bfs_path(graph, leaf_vertex, goal_vertex;)
+        backward_path = bfs_path(graph, goal_vertex, leaf_vertex;)
+        !isnothing(forward_path) && push!(forward_paths, forward_path)
+        !isnothing(backward_path) && push!(backward_paths, backward_path)
+    end
+
+    index_forward = fill(1,length(forward_paths))
+    index_backward = fill(1,length(backward_paths))
+
+    sequence = Dict{Int, Set{Pair{Int, Int}}}()
+    layer = 1
+
+    while length(visited) < nblocks && layer <= nblocks
+        for i in 1:length(forward_paths)
+            path = forward_paths[i]
+            if index_forward[i] < length(path)
+                pair = path[index_forward[i]] => path[index_forward[i]+1]
+                dep_set = Set(dependency_list(graph, pair))
+                if isempty(dep_set) || dep_set ∩ visited == dep_set
+                    push!(visited, pair)
+                    if !haskey(sequence, layer)
+                        sequence[layer] = Set{Pair{Int, Int}}()
+                    end
+                    push!(sequence[layer], pair)
+                    index_forward[i] += 1
+                end
+            end
+        end
+        layer += 1
+    end
+
+    while length(visited) < nblocks * 2 && layer <= nblocks * 2
+        for i in 1:length(backward_paths)
+            path = backward_paths[i]
+            if index_backward[i] < length(path)
+                pair = path[index_backward[i]] => path[index_backward[i]+1]
+                dep_set = Set(dependency_list(graph, pair))
+                if isempty(dep_set) || dep_set ∩ visited == dep_set
+                    push!(visited, pair)
+                    if !haskey(sequence, layer)
+                        sequence[layer] = Set{Pair{Int, Int}}()
+                    end
+                    push!(sequence[layer], pair)
+                    index_backward[i] += 1
+                end
+            end
+        end
+        layer += 1
+    end
+
+    output_sequence = Dict(key => collect(value) for (key, value) in sequence)
+    return all_blocks, visited, output_sequence
+end
+
+"""
+    find_equiv_blocks(graph, goal_vertex)
+
+Get the equivalent_list.
+"""
+function find_equiv_blocks(graph, goal_vertex)
+    all_blocks, visited, sequence = find_computation_sequence(graph, goal_vertex)
+    equivalent_list = []
+
+    for seq_index in sort(collect(keys(sequence)))
+        blocks = collect(sequence[seq_index])
+        for i in 1:(length(blocks)-1)
+            for j in i+1:length(blocks)
+                pair1 = blocks[i]
+                pair2 = blocks[j]
+                if is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
+                    push!(equivalent_list, Set([pair1, pair2]))
+                    visited = filter!(!=(pair1), visited)
+                    visited = filter!(!=(pair2), visited)
+                end
+            end
+        end
+    end
+
+    for i in 1:(length(visited)-1)
+        for j in i+1:length(visited)
+            pair1 = collect(visited)[i]
+            pair2 = collect(visited)[j]
+            if is_equivalent_blocks(graph, pair1, pair2, equivalent_list)
+                push!(equivalent_list, Set([pair1, pair2]))
+            end
+        end
+    end
+
+    merged_sets = []
+
+    for current_set in equivalent_list
+        merged = false
+        for i in 1:length(merged_sets)
+            if !isempty(current_set ∩ merged_sets[i])
+                merged_sets[i] = merged_sets[i] ∪ current_set
+                merged = true
+                break
+            end
+        end
+        if !merged
+            push!(merged_sets, current_set)
+        end
+    end
+
+    all_equiv_set = Set()
+    for set in merged_sets
+        all_equiv_set = all_equiv_set ∪ set
+    end
+
+    for pair in all_blocks
+        if !((pair) in all_equiv_set)
+            push!(merged_sets, Set([pair]))
+        end
+    end
+
+    # --- Transitive merging across layers ---
+    # At this point, merged_sets only unions sets that overlap directly.
+    # However, blocks that are equivalent can appear in different layers and
+    # never be compared directly. We now iteratively merge any two sets if
+    # any pair across the two sets are equivalent under current knowledge.
+    changed = true
+    while changed
+        changed = false
+        i = 1
+        while i <= length(merged_sets)
+            j = i + 1
+            while j <= length(merged_sets)
+                si = merged_sets[i]
+                sj = merged_sets[j]
+                # Check if any cross pair is equivalent given current sets
+                any_equiv = false
+                for p in si
+                    any_equiv && break
+                    for q in sj
+                        if is_equivalent_blocks(graph, p, q, merged_sets)
+                            any_equiv = true
+                            break
+                        end
+                    end
+                end
+                if any_equiv
+                    # Union and continue; don't increment j as we removed an element
+                    merged_sets[i] = si ∪ sj
+                    deleteat!(merged_sets, j)
+                    changed = true
+                else
+                    j += 1
+                end
+            end
+            i += 1
+        end
+    end
+
+    output_vector = [collect(set) for set in merged_sets]
+    return output_vector
+    # n-element Vector{Vector{Pair{Int64, Int64}}}
+end
+
+function find_computation_sequence(graph)
+    groups_dict = Dict()
+    subtree_arrays = [collect(set) for set in find_all_equivalent_subtrees(graph)]
+    front_vertices = Set()
+    for subtree_array in subtree_arrays
+        front_vertex = subtree_array[1].v
+        push!(front_vertices, front_vertex)
+    end
+    front_vertices = collect(front_vertices)
+
+    for goal in front_vertices
+        groups_dict[goal] = length(find_equiv_blocks(graph, goal))
+    end
+
+    sequence = find_computation_sequence(graph, argmin(groups_dict))[3]
+
+    return sequence
+end
+
+"""
+    group_equiv_blocks(graph)
+
+Determin the optimal choice of goal vertex and produce the optimized scheme.
+"""
+function group_equivalent_blocks_traversal(graph::BlockCopolymerGraph)
+    eqblocks = nothing
+    for (_, goal) in graph.joint2node
+        candidate = find_equiv_blocks(graph, goal)
+        if isnothing(eqblocks)
+            eqblocks = candidate
+        else
+            eqblocks = length(candidate) < length(eqblocks) ? candidate : eqblocks
+        end
+    end
+
+    return eqblocks
+end
+
+"To be compitable with the previous API."
+function group_equivalent_blocks(bcg::BlockCopolymerGraph)
+    return group_equivalent_blocks_traversal(bcg)
+end
+
+"To be compitable with the previous API."
+function group_equivalent_blocks(bc::BlockCopolymer)
+    bcg = BlockCopolymerGraph(bc)
+    return group_equivalent_blocks_traversal(bcg)
+end

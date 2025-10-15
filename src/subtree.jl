@@ -10,7 +10,7 @@ An induced subgraph of the original graph. It has a special vertex which is name
 ## Fields
 * `graph`: a Graphs object that describes the subtree.
 * `vmap`: an `AbstractVector` object whose indices are vertices of `Subtree.graph` and values are their corresponding vertices in the original graph.
-* `vmap`: an `AbstractVector` object which is a reverse of `vmap`.
+* `rvmap`: an `AbstractVector` object which is a reverse of `vmap`.
 * `vi`: the internal index (i.e. vertex in `Subtree.graph`) of the front vertex. Value 0 means the front vertex is not set.
 * `v`: the index of the front vertex in the original graph. Value 0 means the front vertex is not set.
 """
@@ -161,10 +161,10 @@ induced_subtree(bcg::BlockCopolymerGraph, v) = induced_subtree(bcg.graph, v)
 
 """
     induced_subtree(BlockCopolymerGraph, edge1, edge2)
-    induced_subtree(LightGraphs, edge1, edge2)
+    induced_subtree(AbstractGraph, edge1, edge2)
 
 Cut the input graph at edges `e1` and `e2`.
-Return the subtree wich contains both edges' vertices.
+Return the subtree which contains both edges' vertices.
 """
 function induced_subtree(graph::AbstractGraph, e1::AbstractEdge, e2::AbstractEdge)
     # Make sure e1 and e2 has are two distinct edges
