@@ -297,31 +297,91 @@ function starABCDO4()
     return BlockCopolymer(:ABCDO4, [O1, O2, O3, O4, A2, A3, A4, B2, B3, C1, C2, C4, D3, D4, X12, X13, X14])
 end
 
-abg = diblock_chain() |> BlockCopolymerGraph
+function chainM2(fA, τ)
+    fA1 = fA * (τ) / (τ + 14)
+    fA2 = fA * (1) / (τ + 14)
+    fB = (1 - fA) / 16
+    A1 = PolymerBlock(:A1, KuhnSegment(:A), fA1, FreeEnd(:A1), BranchPoint(:EB1))
 
-abag = linearABA() |> BlockCopolymerGraph
+    A21 = PolymerBlock(:A21, KuhnSegment(:A), fA2, BranchPoint(:EB1), BranchPoint(:EB21))
+    A22 = PolymerBlock(:A22, KuhnSegment(:A), fA2, BranchPoint(:EB1), BranchPoint(:EB22))
 
-branchg = branchAB() |> BlockCopolymerGraph
+    A31 = PolymerBlock(:A31, KuhnSegment(:A), fA2, BranchPoint(:EB21), BranchPoint(:EB31))
+    A32 = PolymerBlock(:A32, KuhnSegment(:A), fA2, BranchPoint(:EB21), BranchPoint(:EB32))
+    A33 = PolymerBlock(:A33, KuhnSegment(:A), fA2, BranchPoint(:EB22), BranchPoint(:EB33))
+    A34 = PolymerBlock(:A34, KuhnSegment(:A), fA2, BranchPoint(:EB22), BranchPoint(:EB34))
 
-semibranchg = branchAB(0.08, 0.12) |> BlockCopolymerGraph
+    A41 = PolymerBlock(:A41, KuhnSegment(:A), fA2, BranchPoint(:EB31), BranchPoint(:EB41))
+    A42 = PolymerBlock(:A42, KuhnSegment(:A), fA2, BranchPoint(:EB31), BranchPoint(:EB42))
+    A43 = PolymerBlock(:A43, KuhnSegment(:A), fA2, BranchPoint(:EB32), BranchPoint(:EB43))
+    A44 = PolymerBlock(:A44, KuhnSegment(:A), fA2, BranchPoint(:EB32), BranchPoint(:EB44))
+    A45 = PolymerBlock(:A45, KuhnSegment(:A), fA2, BranchPoint(:EB33), BranchPoint(:EB45))
+    A46 = PolymerBlock(:A46, KuhnSegment(:A), fA2, BranchPoint(:EB33), BranchPoint(:EB46))
+    A47 = PolymerBlock(:A47, KuhnSegment(:A), fA2, BranchPoint(:EB34), BranchPoint(:EB47))
+    A48 = PolymerBlock(:A48, KuhnSegment(:A), fA2, BranchPoint(:EB34), BranchPoint(:EB48))
 
-branch2g = branchAB2() |> BlockCopolymerGraph
+    B1 = PolymerBlock(:B1, KuhnSegment(:B), fB, BranchPoint(:EB41), BranchPoint(:EB51))
+    B2 = PolymerBlock(:B2, KuhnSegment(:B), fB, BranchPoint(:EB41), BranchPoint(:EB52))
+    B3 = PolymerBlock(:B3, KuhnSegment(:B), fB, BranchPoint(:EB42), BranchPoint(:EB53))
+    B4 = PolymerBlock(:B4, KuhnSegment(:B), fB, BranchPoint(:EB42), BranchPoint(:EB54))
+    B5 = PolymerBlock(:B5, KuhnSegment(:B), fB, BranchPoint(:EB43), BranchPoint(:EB55))
+    B6 = PolymerBlock(:B6, KuhnSegment(:B), fB, BranchPoint(:EB43), BranchPoint(:EB56))
+    B7 = PolymerBlock(:B7, KuhnSegment(:B), fB, BranchPoint(:EB44), BranchPoint(:EB57))
+    B8 = PolymerBlock(:B8, KuhnSegment(:B), fB, BranchPoint(:EB44), BranchPoint(:EB58))
+    B9 = PolymerBlock(:B9, KuhnSegment(:B), fB, BranchPoint(:EB45), BranchPoint(:EB59))
+    B10 = PolymerBlock(:B10, KuhnSegment(:B), fB, BranchPoint(:EB45), BranchPoint(:EB60))
+    B11 = PolymerBlock(:B11, KuhnSegment(:B), fB, BranchPoint(:EB46), BranchPoint(:EB61))
+    B12 = PolymerBlock(:B12, KuhnSegment(:B), fB, BranchPoint(:EB46), BranchPoint(:EB62))
+    B13 = PolymerBlock(:B13, KuhnSegment(:B), fB, BranchPoint(:EB47), BranchPoint(:EB63))
+    B14 = PolymerBlock(:B14, KuhnSegment(:B), fB, BranchPoint(:EB47), BranchPoint(:EB64))
+    B15 = PolymerBlock(:B15, KuhnSegment(:B), fB, BranchPoint(:EB48), BranchPoint(:EB65))
+    B16 = PolymerBlock(:B16, KuhnSegment(:B), fB, BranchPoint(:EB48), BranchPoint(:EB66))
 
-chainABCACDg = chainABCACD() |> BlockCopolymerGraph
+    return BlockCopolymer(:dendron_AB, [A1,A21,A22,A31,A32,A33,A34,A41,A42,A43,A44,A45,A46,A47,A48,
+    B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15,B16])
+end
 
-chainA6B6g = chainA6B6() |> BlockCopolymerGraph
+ab = diblock_chain()
+abg = ab |> BlockCopolymerGraph
 
-starA2B2g = starA2B2() |> BlockCopolymerGraph
+aba = linearABA()
+abag = aba |> BlockCopolymerGraph
 
-starAB3A3g = starAB3A3() |> BlockCopolymerGraph
+branch = branchAB()
+branchg = branch |> BlockCopolymerGraph
 
-starAB3A6g = starAB3A6() |> BlockCopolymerGraph
+semibranch = branchAB(0.08, 0.12)
+semibranchg = semibranch |> BlockCopolymerGraph
 
-starAB4A8g = starAB4A8() |> BlockCopolymerGraph
+branch2 = branchAB2()
+branch2g = branch2 |> BlockCopolymerGraph
 
-starABCDOg = starABCDO() |> BlockCopolymerGraph
+ABCACD = chainABCACD()
+chainABCACDg = ABCACD |> BlockCopolymerGraph
 
-starABCDO4g = starABCDO4() |> BlockCopolymerGraph
+A6B6 = chainA6B6()
+chainA6B6g = A6B6 |> BlockCopolymerGraph
+
+A2B2 = starA2B2()
+starA2B2g = A2B2 |> BlockCopolymerGraph
+
+AB3A3 = starAB3A3()
+starAB3A3g = AB3A3 |> BlockCopolymerGraph
+
+AB3A6 = starAB3A6()
+starAB3A6g = AB3A6 |> BlockCopolymerGraph
+
+AB4A8 = starAB4A8()
+starAB4A8g = AB4A8 |> BlockCopolymerGraph
+
+ABCDO = starABCDO()
+starABCDOg = ABCDO |> BlockCopolymerGraph
+
+ABCDO4 = starABCDO4()
+starABCDO4g = ABCDO4 |> BlockCopolymerGraph
+
+M2 = chainM2(0.25, 10)
+M2g = M2 |> BlockCopolymerGraph
 
 # Prevent displaying last line in the REPL
 nothing
