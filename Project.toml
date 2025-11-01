@@ -1,7 +1,7 @@
 name = "PolymerArchitecture"
 uuid = "9f77f41a-3be8-4884-a3be-1fccfab54d3c"
 authors = ["Yi-Xin Liu <lyx@fudan.edu.cn>"]
-version = "0.3.7"
+version = "0.3.8"
 
 [deps]
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
