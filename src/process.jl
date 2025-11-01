@@ -719,10 +719,22 @@ function find_equiv_blocks(graph, goal_vertex)
     end
 
     # --- Transitive merging across layers ---
-    # At this point, merged_sets only unions sets that overlap directly.
-    # However, blocks that are equivalent can appear in different layers and
-    # never be compared directly. We now iteratively merge any two sets if
-    # any pair across the two sets are equivalent under current knowledge.
+    # At this point, `merged_sets` contains sets that were joined because
+    # they directly overlapped (i.e. shared an element). However, two
+    # equivalence sets discovered in different BFS layers may be
+    # semantically equivalent even if they did not overlap directly. That
+    # happens because `is_equivalent_blocks` compares dependency structures
+    # and equivalence can be transitive across layers. To produce the
+    # final grouping expected by callers (and tests), we must compute the
+    # transitive closure of equivalence across these sets.
+    #
+    # We therefore repeatedly scan pairs of sets and merge them if any
+    # cross-pair (p in Si, q in Sj) is judged equivalent by
+    # `is_equivalent_blocks(graph, p, q, merged_sets)`. The iterative
+    # approach continues until no more merges occur. This preserves the
+    # existing equivalence predicate and ensures groups include all
+    # propagators that should be in the same equivalence class even when
+    # discovered in separate layers.
     changed = true
     while changed
         changed = false

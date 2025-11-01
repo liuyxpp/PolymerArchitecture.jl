@@ -50,3 +50,20 @@ end
     ]
     @test canon_groups(got) == canon_groups(expected)
 end
+
+@testset "group_equivalent_blocks_traversal: partition properties" begin
+    for g in (abg, abag, branchg, semibranchg, branch2g, chainABCACDg, chainA6B6g, starA2B2g, starAB3A3g, starAB3A6g, starAB4A8g, starABCDOg, starABCDO4g, M2g, chainb9g)
+        groups = group_equivalent_blocks_traversal(g)
+        # flatten and count all directed propagators
+        flat = reduce(vcat, groups)
+        # ensure there are no duplicates
+        @test length(flat) == length(unique(flat))
+        # ensure every directed edge in the graph appears exactly once
+        all_pairs = Pair{Int,Int}[]
+        for e in collect(edges(g))
+            push!(all_pairs, e.src=>e.dst)
+            push!(all_pairs, e.dst=>e.src)
+        end
+        @test sort(collect(all_pairs)) == sort(flat)
+    end
+end

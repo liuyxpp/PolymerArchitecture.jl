@@ -341,6 +341,35 @@ function chainM2(fA, τ)
     B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15,B16])
 end
 
+function chain_b9(fA::Float64)
+    fA_segment = fA / 10
+    fB_segment = (1 - fA) / 9
+
+    A1 = PolymerBlock(:A1, KuhnSegment(:A), 2*fA_segment, FreeEnd(:A1), BranchPoint(:EB1))
+
+    A2 = PolymerBlock(:A2, KuhnSegment(:A), fA_segment, BranchPoint(:EB1), BranchPoint(:EB2))
+    A3 = PolymerBlock(:A3, KuhnSegment(:A), fA_segment, BranchPoint(:EB2), BranchPoint(:EB3))
+    A4 = PolymerBlock(:A4, KuhnSegment(:A), fA_segment, BranchPoint(:EB3), BranchPoint(:EB4))
+    A5 = PolymerBlock(:A5, KuhnSegment(:A), fA_segment, BranchPoint(:EB4), BranchPoint(:EB5))
+    A6 = PolymerBlock(:A6, KuhnSegment(:A), fA_segment, BranchPoint(:EB5), BranchPoint(:EB6))
+    A7 = PolymerBlock(:A7, KuhnSegment(:A), fA_segment, BranchPoint(:EB6), BranchPoint(:EB7))
+    A8 = PolymerBlock(:A8, KuhnSegment(:A), fA_segment, BranchPoint(:EB7), BranchPoint(:EB8))
+    A9 = PolymerBlock(:A9, KuhnSegment(:A), fA_segment, BranchPoint(:EB8), BranchPoint(:EB9))
+
+    B1 = PolymerBlock(:B1, KuhnSegment(:B), fB_segment, FreeEnd(:B1), BranchPoint(:EB1))
+    B2 = PolymerBlock(:B2, KuhnSegment(:B), fB_segment, FreeEnd(:B2), BranchPoint(:EB2))
+    B3 = PolymerBlock(:B3, KuhnSegment(:B), fB_segment, FreeEnd(:B3), BranchPoint(:EB3))
+    B4 = PolymerBlock(:B4, KuhnSegment(:B), fB_segment, FreeEnd(:B4), BranchPoint(:EB4))
+    B5 = PolymerBlock(:B5, KuhnSegment(:B), fB_segment, FreeEnd(:B5), BranchPoint(:EB5))
+    B6 = PolymerBlock(:B6, KuhnSegment(:B), fB_segment, FreeEnd(:B6), BranchPoint(:EB6))
+    B7 = PolymerBlock(:B7, KuhnSegment(:B), fB_segment, FreeEnd(:B7), BranchPoint(:EB7))
+    B8 = PolymerBlock(:B8, KuhnSegment(:B), fB_segment, FreeEnd(:B8), BranchPoint(:EB8))
+    B9 = PolymerBlock(:B9, KuhnSegment(:B), fB_segment, FreeEnd(:B9), BranchPoint(:EB9))
+
+    return BlockCopolymer(:comb_AB, [A1, A2, A3, A4, A5, A6, A7, A8, A9,
+                                     B1, B2, B3, B4, B5, B6, B7, B8, B9])
+end
+
 ab = diblock_chain()
 abg = ab |> BlockCopolymerGraph
 
@@ -382,6 +411,9 @@ starABCDO4g = ABCDO4 |> BlockCopolymerGraph
 
 M2 = chainM2(0.25, 10)
 M2g = M2 |> BlockCopolymerGraph
+
+chainb9 = chain_b9(0.4)
+chainb9g = chainb9 |> BlockCopolymerGraph
 
 # Prevent displaying last line in the REPL
 nothing
