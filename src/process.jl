@@ -187,7 +187,7 @@ function process_equivalent_subtrees(bcg::BlockCopolymerGraph, subtrees)
                 # If any front vertex other than v is in the branch, we are in the exbran. Set the flag to be true and break this loop.
                 (vf ∈ branch.vmap) && (exclude = true; break)
             end
-            exclude ? (exbranch=branch) : push!(to_merge_branches, branch)
+            exclude ? (exbranch = branch) : push!(to_merge_branches, branch)
         end
         # Find the new front vertex in the exbranch which forms an edge with v.
         # Note that the internal front vertex (exbranch.vi) is used. And we have to convert the internal index to the original BlockCopolymerGraph.
@@ -233,7 +233,7 @@ function process_leaf(bcg::BlockCopolymerGraph, v)
             append!(semi_equivalent_subtrees, ss)
             for isolated_subtrees in is
                 es, ss = process_isolated_isomorphic_subtrees(bcg,
-                                                isolated_subtrees)
+                    isolated_subtrees)
                 append!(semi_equivalent_subtrees, ss)
                 append!(equiv_subtrees_list, es)
             end
@@ -385,7 +385,7 @@ end
 Remove identical equivalent blocks in the list. This case occurs when two equivalent subtrees have a common edge. For example, if the common edge is Edge(7,8), it will produce [[7=>8, 8=>7], [8=>7, 7=>8]]. Therefore, we have to remove one of these to eliminate duplication.
 """
 function unique_blocks(eqblock_list::Vector{Vector{Pair{V,V}}}) where V
-    same_blocks = Pair{V, V}[]
+    same_blocks = Pair{V,V}[]
     unique_eqblock_list = Vector{Pair{V,V}}[]
     for eqblocks in eqblock_list
         if length(eqblocks) != 2
@@ -415,7 +415,7 @@ Group equivalent blocks into a vector of block groups via isomorphic graph appro
 function group_equivalent_blocks_isomorph(bcg::BlockCopolymerGraph)
     if nv(bcg) == 2
         v1, v2 = vertices(bcg)
-        return [[v1=>v2, v2=>v1]]
+        return [[v1 => v2, v2 => v1]]
     end
 
     V = eltype(bcg)
@@ -427,8 +427,8 @@ function group_equivalent_blocks_isomorph(bcg::BlockCopolymerGraph)
         edges = list_edges_by_order(ess[1])
         for e in edges
             v1, v2 = src(e), dst(e)
-            push!(eqblock_list, [v1=>v2])
-            push!(eqblock_list, [v2=>v1])
+            push!(eqblock_list, [v1 => v2])
+            push!(eqblock_list, [v2 => v1])
         end
         length(ess) == 1 && continue
         for et in ess[2:end]
@@ -437,8 +437,8 @@ function group_equivalent_blocks_isomorph(bcg::BlockCopolymerGraph)
             edgesx = apply_mapping(vmap, edges)
             for e in edgesx
                 v1, v2 = src(e), dst(e)
-                push!(eqblock_list[idx], v1=>v2)
-                push!(eqblock_list[idx+1], v2=>v1)
+                push!(eqblock_list[idx], v1 => v2)
+                push!(eqblock_list[idx+1], v2 => v1)
                 idx += 2
             end
         end
@@ -448,9 +448,9 @@ function group_equivalent_blocks_isomorph(bcg::BlockCopolymerGraph)
     flat_eqblock_list = isempty(eqblock_list) ? [] : reduce(vcat, eqblock_list)
     for e in keys(bcg.edge2block)
         v1, v2 = e
-        if (v1=>v2) ∉ flat_eqblock_list
-            push!(eqblock_list, [v1=>v2])
-            push!(eqblock_list, [v2=>v1])
+        if (v1 => v2) ∉ flat_eqblock_list
+            push!(eqblock_list, [v1 => v2])
+            push!(eqblock_list, [v2 => v1])
         end
     end
 
@@ -464,8 +464,8 @@ group_equivalent_blocks_isomorph(bc::BlockCopolymer) = group_equivalent_blocks(B
 
 Generate breadth-first search paths starting from all leaf vertices towards one goal vertex.
 """
-function bfs_path(graph, start, goal; print_level = false)
-    predecessor = Dict{Int, Int}() #前驱顶点
+function bfs_path(graph, start, goal; print_level=false)
+    predecessor = Dict{Int,Int}() #前驱顶点
     visited = Set{Int}() #已访问顶点
     queue = [start] #顶点队列
     push!(visited, start)
@@ -509,11 +509,11 @@ end
 
 Find all dependent propagators for a certain propagator (pair).
 """
-function dependency_list(graph, pair::Pair{Int, Int})
+function dependency_list(graph, pair::Pair{Int,Int})
     src, dst = pair[1], pair[2]
-    list = Pair{Int, Int}[]
+    list = Pair{Int,Int}[]
     for neighbor in neighbors(graph, src)
-        !(neighbor == dst) && push!(list, neighbor=>src)
+        !(neighbor == dst) && push!(list, neighbor => src)
     end
     return list
 end
@@ -596,8 +596,8 @@ function find_computation_sequence(graph, goal_vertex)
 
     for edge in collect(edges(graph))
         v1, v2 = edge.src, edge.dst
-        push!(all_blocks, v1=>v2)
-        push!(all_blocks, v2=>v1)
+        push!(all_blocks, v1 => v2)
+        push!(all_blocks, v2 => v1)
     end
 
     nblocks = div(length(all_blocks), 2)
@@ -609,10 +609,10 @@ function find_computation_sequence(graph, goal_vertex)
         !isnothing(backward_path) && push!(backward_paths, backward_path)
     end
 
-    index_forward = fill(1,length(forward_paths))
-    index_backward = fill(1,length(backward_paths))
+    index_forward = fill(1, length(forward_paths))
+    index_backward = fill(1, length(backward_paths))
 
-    sequence = Dict{Int, Set{Pair{Int, Int}}}()
+    sequence = Dict{Int,Set{Pair{Int,Int}}}()
     layer = 1
 
     while length(visited) < nblocks && layer <= nblocks
@@ -624,7 +624,7 @@ function find_computation_sequence(graph, goal_vertex)
                 if isempty(dep_set) || dep_set ∩ visited == dep_set
                     push!(visited, pair)
                     if !haskey(sequence, layer)
-                        sequence[layer] = Set{Pair{Int, Int}}()
+                        sequence[layer] = Set{Pair{Int,Int}}()
                     end
                     push!(sequence[layer], pair)
                     index_forward[i] += 1
@@ -643,7 +643,7 @@ function find_computation_sequence(graph, goal_vertex)
                 if isempty(dep_set) || dep_set ∩ visited == dep_set
                     push!(visited, pair)
                     if !haskey(sequence, layer)
-                        sequence[layer] = Set{Pair{Int, Int}}()
+                        sequence[layer] = Set{Pair{Int,Int}}()
                     end
                     push!(sequence[layer], pair)
                     index_backward[i] += 1
@@ -793,11 +793,16 @@ function find_computation_sequence(graph)
 end
 
 """
-    group_equiv_blocks(graph)
+    group_equivalent_blocks_traversal(graph)
 
 Determin the optimal choice of goal vertex and produce the optimized scheme.
 """
 function group_equivalent_blocks_traversal(graph::BlockCopolymerGraph)
+    # for homopolymers, it only has leafs.
+    if Graphs.nv(graph) <= 2
+        return find_equiv_blocks(graph, first(Graphs.vertices(graph)))
+    end
+    # for other BCPs, the best vertex is one of branch points.
     eqblocks = nothing
     for (_, goal) in graph.joint2node
         candidate = find_equiv_blocks(graph, goal)
